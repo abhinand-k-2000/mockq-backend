@@ -4,6 +4,8 @@ import OtpGenerate from "../infrastructure/utils/generateOtp";
 import JwtToken from "../infrastructure/utils/JwtToken";
 import MailService from "../infrastructure/utils/mailService";
 import HashPassword from "../infrastructure/utils/hashPassword";
+import s3 from "../infrastructure/config/awsConfig"
+import fs from "fs"
 
 class InterviewerUseCase {
     constructor(
@@ -75,19 +77,68 @@ class InterviewerUseCase {
 
             if(!interviewerFound) {
                 return {success: false, message: "Interviewer not found!"}
-            }
-
+            }   
 
             const passwordMatch = await this.hashPassword.compare(password, interviewerFound.password);
-
             if(!passwordMatch) {
                 return {success: false, message: "Wrong password"}
             }
 
-            return {success: true, message: "Interviewer found"}
+            if(interviewerFound.isBlocked){
+                return {success: false, message: "You are blocked by admin"}
+            }
+            
+            let token = this.jwtToken.createJwtToken(interviewerFound._id, "interviewer")
+
+
+            return {success: true, data: {token: token, hasCompletedDetails: interviewerFound.hasCompletedDetails},  message: "Interviewer found"}
         } catch (error) {
             console.log(error);
             return {success: false, message: "An error occured during interviewer login"}
+        }
+    }
+
+    async saveInterviewerDetails(interviewerDetails: InterviewerRegistration){
+        try {
+            const {_id, profilePicture, salarySlip, resume } = interviewerDetails
+
+            const interviewer = await this.iInterviewerRepository.findInterviewerById(_id); 
+            if(!interviewer){
+                return {success: false, message: "Interviewer not found!"}
+            }
+
+            const uploadFileToS3 = async (file: any, keyPrefix: string) => {
+                const params = {
+                    Bucket: process.env.AWS_S3_BUCKET_NAME!,
+                    Key: `${keyPrefix}/${Date.now()}-${file[0].originalname}`,
+                    Body: fs.createReadStream(file[0].path),
+                    ContentType: file[0].mimetype,
+                    ACL: 'public-read',
+                };
+                const data = await s3.upload(params).promise();
+                return data.Location;
+            }; 
+            
+            const profilePictureUrl = await uploadFileToS3(profilePicture, 'profilePictures');
+            const salarySlipUrl = await uploadFileToS3(salarySlip, 'salarySlips');
+            const resumeUrl = await uploadFileToS3(resume, 'resumes');
+
+            interviewerDetails.profilePicture = profilePictureUrl
+            interviewerDetails.salarySlip = salarySlipUrl;
+            interviewerDetails.resume = resumeUrl
+            interviewerDetails.hasCompletedDetails = true
+
+            const updatedInterviewer = await this.iInterviewerRepository.saveInterviewerDetails(interviewerDetails);
+
+            if(updatedInterviewer){
+                return { success: true, message: "Interviewer details updated successfully!", data: updatedInterviewer };
+            } else {
+                return { success: false, message: "Failed to update interviewer details" };
+            }
+
+        } catch (error) {
+           console.log("Error uploading to S3:", error);
+            return { success: false, message: "Internal server error" };
         }
     }
 }

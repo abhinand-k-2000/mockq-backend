@@ -8,6 +8,7 @@ import OtpGenerate from "../utils/generateOtp"
 import JwtToken from "../utils/JwtToken"
 import MailService from "../utils/mailService"
 import HashPassword from "../utils/hashPassword"
+import candidateAuthenticate from "../middlewares/candidateAuth"
 
 const repository = new CandidateRepository()
 const otp = new OtpGenerate()
@@ -22,6 +23,9 @@ router.post('/verify-email', (req, res) => {controller.verifyCadidateEmail(req, 
 router.post('/verify-otp', (req, res) => controller.verifyOtp(req, res))
 router.post('/verify-login', (req, res) => controller.verifyLogin(req, res))
 router.post('/resend-otp', (req, res) => controller.resendOtp(req, res))
+router.post('/logout', (req, res) => controller.logout(req, res))
+
+router.get('/home',candidateAuthenticate, (req, res) => controller.home(req, res))
 
 
 

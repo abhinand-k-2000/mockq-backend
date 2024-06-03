@@ -98,10 +98,28 @@ class CandidateUseCase {
       if (!passwordMatch) {
         return { success: false, message: "Wrong password" };
       }
-      return { success: true, message: "candidate found" };
+
+      if(candidateFound.isBlocked){
+        return {success: false, message: "You are blocked by admin"}
+      }
+      
+      let token = this.jwtToken.createJwtToken(candidateFound._id, "candidate")
+
+
+      return { success: true, data: {token: token}, message: "candidate found" };
     } catch (error) {
       console.log(error);
       return {success: false, message: "An error occured during login"}
+    }
+  }
+
+
+  async getAllStacks() {
+    try {
+        const stacksList = await this.iCandidateRepository.findAllStacks()
+        return stacksList
+    } catch (error) {
+        throw new Error("Failed to fetch stacks")
     }
   }
 }

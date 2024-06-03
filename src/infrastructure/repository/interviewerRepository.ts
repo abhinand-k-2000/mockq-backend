@@ -3,6 +3,7 @@ import IInterviewerRepository from "../../use-cases/interface/IInterviewerReposi
 import { InterviewerModel } from "../database/interviewerModel";
 
 class InterviewerRepository implements IInterviewerRepository {
+  
   async findByEmail(email: string): Promise<InterviewerRegistration | null> {
     try {
       const interviewerFound = await InterviewerModel.findOne({ email: email });
@@ -25,6 +26,35 @@ class InterviewerRepository implements IInterviewerRepository {
       return null
     }
   }
+
+  async findInterviewerById(id: string): Promise<InterviewerRegistration | null> {
+      try {
+        const interviewerData = await InterviewerModel.findById(id)
+        if(interviewerData) return interviewerData
+
+        return null
+      } catch (error) {
+        console.log(error);
+        return null
+      }
+  }
+
+  async saveInterviewerDetails(interviewerDetails: InterviewerRegistration): Promise<InterviewerRegistration | null> {
+    try {
+        const updatedInterviewer = await InterviewerModel.findByIdAndUpdate(
+          interviewerDetails._id,
+          interviewerDetails,
+          { new: true }
+      );
+
+      return updatedInterviewer || null; 
+        
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
 }
 
 export default InterviewerRepository;

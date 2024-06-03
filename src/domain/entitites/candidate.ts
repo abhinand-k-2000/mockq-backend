@@ -1,6 +1,6 @@
 
 interface Candidate {
-    _id?: string,
+    _id: string,
     name: string,
     email: string,
     mobile: number,

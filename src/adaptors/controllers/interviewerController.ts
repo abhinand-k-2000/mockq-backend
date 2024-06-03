@@ -1,7 +1,11 @@
 import { Response, Request } from "express";
 import InterviewerUseCase from "../../use-cases/interviewerUseCase";
+import path from "path";
+import fs from "fs"
 
-
+// interface RequestModified extends Request {
+//     interviewerId?: string
+// }
 
 class InterviewerController {
     constructor(
@@ -97,18 +101,82 @@ class InterviewerController {
 
             const interviewer = await this.interviewerCase.interviewerLogin(email, password)
             if(interviewer.success){
-                res.status(200).json({success: true, message: "Interviewer Logged in"})
+                res.cookie('interviewerToken', interviewer.data?.token, {
+                    expires: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // Expires in 2 days
+                    httpOnly: true,   
+                })
+                res.status(200).json(interviewer)
             }else {
                 res.status(400).json({success: false, message: interviewer?.message})
             }
+        } catch (error) { 
+            console.log(error)
+            res.status(500).json({success: false, message: "Internal server error"})
+        }
+    }
+
+    async verifyDetails(req: Request, res: Response) {
+        try {
+            const {yearsOfExperience, currentDesignation, organisation, collegeUniversity, introduction} = req.body
+            const { profilePicture, salarySlip, resume } = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+            if (!profilePicture || !salarySlip || !resume) {
+                return res.status(400).json({ success: false, message: "All files must be uploaded" });
+            }
+
+            const interviewerDetails = {
+                ...req.body,
+                ...req.files,
+                _id: req.interviewerId
+            }
+
+            
+            const interviewerId = req.interviewerId
+            const updatedInterviewer  = await this.interviewerCase.saveInterviewerDetails(interviewerDetails)
+
+
+            
+            if (updatedInterviewer.success) {
+
+                // TO REMOVE FILES FROM SERVER
+                [profilePicture, salarySlip, resume].forEach((files) => {
+                    files.forEach(file => {
+                        const filePath = path.join(__dirname, '../../infrastructure/public/images', file.filename);
+                        fs.unlink(filePath, (err)=> {
+                            if(err){
+                                console.log("Error deleting the file from server", err)
+                            }
+                        })
+                    })
+                })
+
+                return res.status(200).json({ success: true, message: "Interviewer details verified successfully", data: updatedInterviewer });
+            } else {
+                return res.status(404).json({ success: false, message: "Interviewer not found or unable to update details" });
+            }
+
+
         } catch (error) {
             console.log(error)
             res.status(500).json({success: false, message: "Internal server error"})
         }
     }
 
+
+    async logout(req: Request, res: Response){
+        try {
+            res.cookie("interviewerToken", "", {
+              httpOnly: true,
+              expires: new Date(0),
+            });
+            res.status(200).json({ success: true });
+          } catch (error) {
+            console.log(error);
+          }
+    }
+
 }
 
 
 
-export default InterviewerController
+export default InterviewerController 

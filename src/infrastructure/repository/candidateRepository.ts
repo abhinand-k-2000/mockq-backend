@@ -1,6 +1,8 @@
 import Candidate from "../../domain/entitites/candidate";
+import Stack from "../../domain/entitites/stack";
 import ICandidateRepository from "../../use-cases/interface/ICandidateRepository";
 import { CandidateModel } from "../database/candidateModel";
+import { StackModel } from "../database/stackModel";
 
 class CandidateRepository implements ICandidateRepository {
 
@@ -27,6 +29,27 @@ class CandidateRepository implements ICandidateRepository {
       console.log(error)
       return null
     }
+  }
+
+  async findCandidateById(id: string): Promise<Candidate | null> {
+    try {
+      const candidateData = await CandidateModel.findById(id)
+      return candidateData
+    } catch (error) {
+      console.log(error)
+      return null
+    }
+  }
+
+
+  async findAllStacks(): Promise<Stack[]> {
+    try {
+      const stacks = await StackModel.find()
+      return stacks
+    } catch (error) {
+      throw new Error("Failed to fetch stacks from database");
+    }
+    
   }
 
   

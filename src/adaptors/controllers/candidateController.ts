@@ -97,15 +97,45 @@ class CandidateController {
     try {
       const {email, password} = req.body
       const candidate = await this.candidateCase.candidateLogin(email, password)
+      console.log("canidi: ", candidate)
       if(candidate?.success) {
-        res.status(200).json({success: true, message: "Candidate logged in "})
+
+        res.cookie('candidateToken', candidate.data?.token, {
+          expires: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // Expires in 2 days
+          httpOnly: true
+        })
+
+        res.status(200).json(candidate)
       }else {
         console.log(candidate)
         res.status(400).json({success: false, message: candidate?.message})
       }
     } catch (error) {
       console.log(error)
-      res.status(500).json({message: "Internal server error"})
+      res.status(500).json({success: false, message: "Internal server error"})
+    }
+  }
+
+
+   logout(req: Request, res: Response) {
+    try {
+      res.cookie("candidateToken", "", {
+        httpOnly: true,
+        expires: new Date(0),
+      });
+      res.status(200).json({ success: true });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async home (req: Request, res: Response) {
+    try {
+      const stacksList = await this.candidateCase.getAllStacks()
+      console.log(stacksList)
+      return res.status(200).json({success: true, data: {stacks: stacksList}})
+    } catch (error) {
+      res.status(500).json({success: false, message: "Internal server error"})
     }
   }
 

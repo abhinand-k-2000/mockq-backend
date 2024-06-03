@@ -24,7 +24,8 @@ const interviewerSchema: Schema<InterviewerProfile> = new Schema({
         default: false
     },
     isApproved: {
-        type: Boolean
+        type: Boolean,
+        default: false
     },
     organisation: {
         type: String
@@ -35,10 +36,10 @@ const interviewerSchema: Schema<InterviewerProfile> = new Schema({
     yearsOfExperience: {
         type: String
     },
-    college: {
+    collegeUniversity: {
         type: String
     },
-    profilePhoto: {
+    profilePicture: {
         type: String
     },
     salarySlip: {
@@ -49,6 +50,10 @@ const interviewerSchema: Schema<InterviewerProfile> = new Schema({
     },
     introduction: {
         type: String
+    },
+    hasCompletedDetails: {
+        type: Boolean, 
+        default: false
     }
 })
 
