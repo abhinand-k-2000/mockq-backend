@@ -10,7 +10,7 @@ declare global {
         }
     }
 }
-
+ 
 
 const amdinAuth = async (req: Request, res: Response, next: NextFunction) => {
     let token = req.cookies.adminToken;

@@ -107,7 +107,7 @@ class InterviewerController {
                 })
                 res.status(200).json(interviewer)
             }else {
-                res.status(400).json({success: false, message: interviewer?.message})
+                res.status(400).json(interviewer)
             }
         } catch (error) { 
             console.log(error)
@@ -130,7 +130,6 @@ class InterviewerController {
                 _id: req.interviewerId
             }
 
-            
             const interviewerId = req.interviewerId
             const updatedInterviewer  = await this.interviewerCase.saveInterviewerDetails(interviewerDetails)
 
@@ -154,7 +153,7 @@ class InterviewerController {
             } else {
                 return res.status(404).json({ success: false, message: "Interviewer not found or unable to update details" });
             }
-
+  
 
         } catch (error) {
             console.log(error)

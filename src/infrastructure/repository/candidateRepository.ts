@@ -44,7 +44,7 @@ class CandidateRepository implements ICandidateRepository {
 
   async findAllStacks(): Promise<Stack[]> {
     try {
-      const stacks = await StackModel.find()
+      const stacks = await StackModel.find({isListed: true})
       return stacks
     } catch (error) {
       throw new Error("Failed to fetch stacks from database");

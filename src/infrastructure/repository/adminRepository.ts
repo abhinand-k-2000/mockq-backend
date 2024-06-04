@@ -40,16 +40,18 @@ class AdminRepository implements IAdminRepository {
     }
   }
 
-  async getInterviewerDetails(id: string): Promise<InterviewerRegistration | null> {
+  async getInterviewerDetails(
+    id: string
+  ): Promise<InterviewerRegistration | null> {
     try {
       const interviewerDetails = await InterviewerModel.findById(id);
       if (interviewerDetails) {
         return interviewerDetails;
-      }else {
-        return null
+      } else {
+        return null;
       }
     } catch (error) {
-        throw new Error("Failed to fetch interviewer from database");
+      throw new Error("Failed to fetch interviewer from database");
     }
   }
 
@@ -69,15 +71,28 @@ class AdminRepository implements IAdminRepository {
     }
   }
 
+  async unlistStack(stackId: string): Promise<Stack | null> {
+    try {
+      const stack = await StackModel.findById(stackId);
+      if (!stack) return null;
+  
+      const stackUnlist = await StackModel.findByIdAndUpdate(stackId, { isListed: !stack.isListed }, {new: true});
+      return stackUnlist;
+    } catch (error) {
+      throw new Error("Failed to unlist stack");
+    }
+  }
+  
+
   async approveInterviewer(interviewerId: string): Promise<boolean> {
     try {
       const interviewer = await InterviewerModel.findByIdAndUpdate(
-        {_id: interviewerId},
-        {isApproved: true}
-      )
-      return true 
+        { _id: interviewerId },
+        { isApproved: true }
+      );
+      return true;
     } catch (error) {
-      throw new Error("Failed to approve the interviewer")
+      throw new Error("Failed to approve the interviewer");
     }
   }
 

@@ -97,7 +97,6 @@ class CandidateController {
     try {
       const {email, password} = req.body
       const candidate = await this.candidateCase.candidateLogin(email, password)
-      console.log("canidi: ", candidate)
       if(candidate?.success) {
 
         res.cookie('candidateToken', candidate.data?.token, {

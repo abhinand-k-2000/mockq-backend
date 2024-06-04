@@ -20,7 +20,7 @@ class AdminUseCase {
             adminFound._id as string,
             "admin"
           );
-          return { success: true, adminData: adminFound, token };
+          return { success: true, adminData: adminFound._id, token };
         } else {
           return { success: false, message: "Invalid Password" };
         }
@@ -55,7 +55,6 @@ class AdminUseCase {
     }
   }
 
-  adminLogout() {}
 
   async getAllCandidates() {
     try {
@@ -92,6 +91,15 @@ class AdminUseCase {
       return candidateBlocked;
     } catch (error) {
       throw new Error("Failed to block candidate");
+    }
+  }
+
+  async unlistStack(stackId: string) {
+    try {
+      const stackUnlist = await this.iAdminRepository.unlistStack(stackId)
+      return stackUnlist
+    } catch (error) {
+      throw new Error("Failed to unlist the stack")
     }
   }
 

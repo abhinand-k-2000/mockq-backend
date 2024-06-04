@@ -10,9 +10,13 @@ const stackSchema: Schema<Stack> = new Schema({
     technologies: {
         type: [String],
         required: true
-    } 
+    }, 
+    isListed: {
+        type: Boolean,
+        default: true
+    }
 })
 
 const StackModel: Model<Stack> = mongoose.model("Stack", stackSchema)
 
-export {StackModel}
+export {StackModel}  

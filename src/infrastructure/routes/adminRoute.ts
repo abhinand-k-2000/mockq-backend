@@ -26,7 +26,7 @@ router.post('/logout', (req, res) => controller.logout(req, res))
 
 router.post('/add-stack',adminAuthenticate, (req, res) => controller.addStack(req, res))
 router.get('/stacks-list',adminAuthenticate, (req, res) => controller.getAllStacks(req, res))
-router.get('/unlist')
+router.put('/unlist-stack/:id', adminAuthenticate, (req, res) => controller.unlistStack(req, res))
 
 router.get('/interviewers-list',adminAuthenticate, (req, res) => controller.getAllInterviewers(req, res))
 router.get('/interviewer/:id',adminAuthenticate, (req, res) => controller.getInterviewerDetails(req, res))

@@ -148,6 +148,19 @@ class AdminController {
             return res.status(500).json({success: false, message: "Failed to fetch stacks"})
         }
     }
+
+    async unlistStack(req: Request, res: Response) {
+        try {
+            const {id} =  req.params
+            const unlistStack = await this.adminCase.unlistStack(id)
+            if(unlistStack){
+                return res.status(200).json({success: true, data: unlistStack})
+            }
+        } catch (error) {
+            console.log(error)
+            return res.status(500).json({success: false, message: "Internal server error"})
+        }
+    }
 }
 
 

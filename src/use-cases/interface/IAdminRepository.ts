@@ -15,6 +15,7 @@ interface IAdminRepository {
     findAllInterviewers(): Promise<InterviewerRegistration[]>
     getInterviewerDetails(id: string): Promise<InterviewerRegistration | null>
     approveInterviewer(id: string): Promise<boolean>
+    unlistStack(id: string): Promise<Stack | null>
 
 }
 

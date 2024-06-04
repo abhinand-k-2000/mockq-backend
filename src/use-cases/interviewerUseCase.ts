@@ -87,6 +87,10 @@ class InterviewerUseCase {
             if(interviewerFound.isBlocked){
                 return {success: false, message: "You are blocked by admin"}
             }
+
+            // if(!interviewerFound.isApproved){
+            //     return {success: false, message: "You are not approved by the admin"}
+            // }
             
             let token = this.jwtToken.createJwtToken(interviewerFound._id, "interviewer")
 
@@ -127,6 +131,7 @@ class InterviewerUseCase {
             interviewerDetails.salarySlip = salarySlipUrl;
             interviewerDetails.resume = resumeUrl
             interviewerDetails.hasCompletedDetails = true
+
 
             const updatedInterviewer = await this.iInterviewerRepository.saveInterviewerDetails(interviewerDetails);
 
