@@ -1,4 +1,4 @@
-import { InterviewerRegistration } from "../../domain/entitites/interviewer";
+import { InterviewerRegistration } from "../domain/entitites/interviewer";
 
 
 interface IInterviewerRepository {

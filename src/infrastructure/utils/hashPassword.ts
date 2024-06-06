@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
+import IHashPassword from "../../interface/utils/IhashPassword";
 
-class HashPassword {
+class HashPassword implements IHashPassword {
 
   async hash(password: string) {
     const salt = await bcrypt.genSalt(10);

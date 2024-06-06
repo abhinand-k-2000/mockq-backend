@@ -14,18 +14,18 @@ const repository = new CandidateRepository()
 const otp = new OtpGenerate()
 const jwt = new JwtToken(process.env.JWT_SECRET as string)
 const mail = new MailService()
-const hashPassword = new HashPassword
+const hashPassword = new HashPassword()
 
 const candidateCase = new CandidateUseCase(repository, otp, jwt, mail, hashPassword)
 const controller = new CandidateController(candidateCase)
 
-router.post('/verify-email', (req, res) => {controller.verifyCadidateEmail(req, res)})
-router.post('/verify-otp', (req, res) => controller.verifyOtp(req, res))
-router.post('/verify-login', (req, res) => controller.verifyLogin(req, res))
-router.post('/resend-otp', (req, res) => controller.resendOtp(req, res))
-router.post('/logout', (req, res) => controller.logout(req, res))
+router.post('/verify-email', (req, res, next) => {controller.verifyCadidateEmail(req, res, next)})
+router.post('/verify-otp', (req, res, next) => controller.verifyOtp(req, res, next))
+router.post('/verify-login', (req, res, next) => controller.verifyLogin(req, res, next))
+router.post('/resend-otp', (req, res, next) => controller.resendOtp(req, res, next))
+router.post('/logout', (req, res, next) => controller.logout(req, res, next))
 
-router.get('/home',candidateAuthenticate, (req, res) => controller.home(req, res))
+router.get('/home',candidateAuthenticate, (req, res, next) => controller.home(req, res, next))
 
 
 

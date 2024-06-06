@@ -5,6 +5,7 @@ import candidateRoute from "../routes/candidateRoute"
 import interviewerRoute from "../routes/interviewerRoute"
 import http from "http"
 import cookieParser from "cookie-parser"
+import errorMiddleware from "../middlewares/errorMiddleware";
 
 
 
@@ -27,7 +28,7 @@ const createServer = () => {
     app.use('/api/interviewer', interviewerRoute)
 
 
-
+    app.use(errorMiddleware)
     const server = http.createServer(app)
     return server
     } catch (error) {

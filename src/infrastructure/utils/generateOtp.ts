@@ -1,15 +1,15 @@
-import IOtp from "../../use-cases/interface/IOtp";
+import IGenerateOtp from "../../interface/utils/IGenerateOtp";
 
-class OtpGenerate implements IOtp {
+class OtpGenerate implements IGenerateOtp {
   generateOtp(): string {
-    var digits = "0123456789";
+    const digits = "0123456789";
 
-    var otpLength = 4;
+    const otpLength = 4;
 
-    var otp = "";
+    let otp = "";
 
     for (let i = 1; i <= otpLength; i++) {
-      var index = Math.floor(Math.random() * digits.length);
+      const index = Math.floor(Math.random() * digits.length);
 
       otp = otp + digits[index];
     }

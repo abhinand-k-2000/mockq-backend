@@ -1,5 +1,5 @@
 import jwt, {JwtPayload} from "jsonwebtoken";
-import IJwtToken from "../../use-cases/interface/IJwtToken";
+import IJwtToken from "../../interface/utils/IJwtToken";
 
 class JwtToken implements IJwtToken{
 

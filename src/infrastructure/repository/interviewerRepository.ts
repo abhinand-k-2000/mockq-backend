@@ -1,60 +1,48 @@
 import { InterviewerRegistration } from "../../domain/entitites/interviewer";
-import IInterviewerRepository from "../../use-cases/interface/IInterviewerRepository";
+import IInterviewerRepository from "../../interface/repositories/IInterviewerRepository";
 import { InterviewerModel } from "../database/interviewerModel";
+import AppError from "../utils/appError";
 
 class InterviewerRepository implements IInterviewerRepository {
-  
   async findByEmail(email: string): Promise<InterviewerRegistration | null> {
-    try {
-      const interviewerFound = await InterviewerModel.findOne({ email: email });
-      if (!interviewerFound) return null;
+    const interviewerFound = await InterviewerModel.findOne({ email: email });
+    if (!interviewerFound) throw new AppError("Interviewer not found", 404);
 
-      return interviewerFound;
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
+    return interviewerFound;
   }
 
-  async saveInterviewer(interviewer: InterviewerRegistration): Promise<InterviewerRegistration | null> {
-    try {
-      const newInterviewer = new InterviewerModel(interviewer)
-      await newInterviewer.save()
-      return newInterviewer
-    } catch (error) {
-      console.log(error);
-      return null
+  async saveInterviewer(
+    interviewer: InterviewerRegistration
+  ): Promise<InterviewerRegistration | null> {
+    const newInterviewer = new InterviewerModel(interviewer);
+    const savedInterviewer = await newInterviewer.save();
+    if (!savedInterviewer) {
+      throw new AppError("Failed to save interviewer", 500);
     }
+    return newInterviewer;
   }
 
-  async findInterviewerById(id: string): Promise<InterviewerRegistration | null> {
-      try {
-        const interviewerData = await InterviewerModel.findById(id)
-        if(interviewerData) return interviewerData
-
-        return null
-      } catch (error) {
-        console.log(error);
-        return null
-      }
+  async findInterviewerById(
+    id: string
+  ): Promise<InterviewerRegistration | null> {
+    const interviewerData = await InterviewerModel.findById(id);
+    if (!interviewerData) {
+      throw new AppError("Interviewer not found", 404);
+    }
+    return interviewerData;
   }
 
-  async saveInterviewerDetails(interviewerDetails: InterviewerRegistration): Promise<InterviewerRegistration | null> {
-    try {
-        const updatedInterviewer = await InterviewerModel.findByIdAndUpdate(
-          interviewerDetails._id,
-          interviewerDetails,
-          { new: true }
-      );
+  async saveInterviewerDetails(
+    interviewerDetails: InterviewerRegistration
+  ): Promise<InterviewerRegistration | null> {
+    const updatedInterviewer = await InterviewerModel.findByIdAndUpdate(
+      interviewerDetails._id,
+      interviewerDetails,
+      { new: true }
+    );
 
-      return updatedInterviewer || null; 
-        
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
-}
-
+    return updatedInterviewer || null;
+  }
 }
 
 export default InterviewerRepository;

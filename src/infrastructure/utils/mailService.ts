@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer"
-import IMailService from "../../use-cases/interface/IMailService";
+import IMailService from "../../interface/utils/IMailService";
 
 
 class MailService implements IMailService{

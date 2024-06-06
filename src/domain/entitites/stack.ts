@@ -1,6 +1,6 @@
 
 interface Stack {
-    _id?: string
+    _id: string
     stackName: string,
     technologies: string[],
     isListed: boolean

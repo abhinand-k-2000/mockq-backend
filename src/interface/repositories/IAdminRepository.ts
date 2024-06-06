@@ -1,7 +1,7 @@
-import Admin from '../../domain/entitites/admin'
-import Candidate from '../../domain/entitites/candidate'
-import { InterviewerRegistration } from '../../domain/entitites/interviewer'
-import Stack from '../../domain/entitites/stack'
+import Admin from '../domain/entitites/admin'
+import Candidate from '../domain/entitites/candidate'
+import { InterviewerRegistration } from '../domain/entitites/interviewer'
+import Stack from '../domain/entitites/stack'
 
 
 interface IAdminRepository {

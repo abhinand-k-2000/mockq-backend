@@ -1,6 +1,7 @@
 import mongoose, {Schema, Model} from "mongoose";
 import Candidate from "../../domain/entitites/candidate";
 
+
 const candidateSchema: Schema<Candidate> = new Schema({
     name: {
         type: String,
@@ -8,7 +9,8 @@ const candidateSchema: Schema<Candidate> = new Schema({
     },
     email: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     mobile: {
         type: Number,
@@ -26,4 +28,5 @@ const candidateSchema: Schema<Candidate> = new Schema({
 })
 
 const CandidateModel: Model<Candidate> = mongoose.model("Candidate", candidateSchema)
+
 export {CandidateModel}

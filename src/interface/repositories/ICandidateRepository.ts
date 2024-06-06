@@ -1,5 +1,5 @@
-import Candidate from "../../domain/entitites/candidate";
-import Stack from "../../domain/entitites/stack";
+import Candidate from "../domain/entitites/candidate";
+import Stack from "../domain/entitites/stack";
 
 interface ICandidateRepository {
     findByEmail(email: string): Promise<Candidate | null>

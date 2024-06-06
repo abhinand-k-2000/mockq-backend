@@ -1,12 +1,12 @@
-import JwtToken from "../../infrastructure/utils/JwtToken";
+import AppError from "../../infrastructure/utils/appError";
 import CandidateUseCase from "../../use-cases/candidateUseCase";
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 
 class CandidateController {
   constructor(private candidateCase: CandidateUseCase) {}
 
-  async verifyCadidateEmail(req: Request, res: Response) {
+  async verifyCadidateEmail(req: Request, res: Response, next: NextFunction) {
     try {
       const { name, email } = req.body;
       const candidateInfo = req.body;
@@ -15,24 +15,24 @@ class CandidateController {
       const nameRegex = /^[a-zA-Z ]{2,30}$/;
 
       if (!email?.trim()) {
-        return res.status(400).json({ success: false, message: "Email is required" });
+        throw new AppError("Email is required", 400);
       } 
       
       if (!emailRegex.test(email)) {
-        return res.status(400).json({ success: false, message: "Invalid email format" });
+        throw new AppError("Invalid email format", 400);
       }
   
       if (!name?.trim()) {
-        return res.status(400).json({ success: false, message: "Name is required" });
+        throw new AppError("Name is required", 400);
       } 
       
       if (!nameRegex.test(name)) {
-        return res.status(400).json({ success: false, message: "Invalid name format" });
+        throw new AppError("Invalid name format", 400);
       }
       const response = await this.candidateCase.findCandidate(candidateInfo);
 
       if (response?.status === 200) {
-        return res.status(400).json({ success: false, message: "User already exists" });
+        throw new AppError("User already exists", 400);
       }
       
       if (response?.status === 201) {
@@ -41,24 +41,23 @@ class CandidateController {
       }
   
     } catch (error) {
-      console.log(error);
-      res.status(500).json({ success: false, message: "Internal server error" });
+      next(error)
     }
   }  
 
-  async resendOtp(req: Request, res: Response) {
+  async resendOtp(req: Request, res: Response, next: NextFunction) {
     try {
       const token = req.headers.authorization?.split(' ')[1] as string;
-      if(!token) return res.status(401).json({success: false, message: "Unauthorised user"})
+      if(!token) throw new AppError("Unauthorised user", 401);
 
       const candidateInfo = await this.candidateCase.getCandidateInfoUsingToken(token);
       if(!candidateInfo){
-        return res.status(400).json({success: false, message: "No user found"})
+        throw new AppError("No user found", 400);
       }
 
       const response = await this.candidateCase.findCandidate(candidateInfo)
       if (response?.status === 200) {
-        return res.status(400).json({ success: false, message: "User already exists" });
+        throw new AppError("User already exists", 400);
       }
       
       if (response?.status === 201) {
@@ -67,12 +66,12 @@ class CandidateController {
       }
 
     } catch (error) {
-      res.status(500).json({ success: false, message: "Internal server error" });
+      next(error)
     }
   }
 
 
-  async verifyOtp(req: Request, res: Response) {
+  async verifyOtp(req: Request, res: Response, next: NextFunction) {
     try {
       const token = req.headers.authorization?.split(' ')[1] as string
       const {otp} = req.body
@@ -86,14 +85,13 @@ class CandidateController {
         res.status(400).json({success: false, message: "OTP not verified"})
       }
     } catch (error) {     
-      console.log(error)
-      res.status(500).json({ message: "Internal server error" });
+      next(error)
     }
   }
 
 
 
-  async verifyLogin(req: Request, res: Response) {
+  async verifyLogin(req: Request, res: Response, next: NextFunction) {
     try {
       const {email, password} = req.body
       const candidate = await this.candidateCase.candidateLogin(email, password)
@@ -105,18 +103,14 @@ class CandidateController {
         })
 
         res.status(200).json(candidate)
-      }else {
-        console.log(candidate)
-        res.status(400).json({success: false, message: candidate?.message})
       }
     } catch (error) {
-      console.log(error)
-      res.status(500).json({success: false, message: "Internal server error"})
+      next(error)
     }
   }
 
 
-   logout(req: Request, res: Response) {
+   logout(req: Request, res: Response, next: NextFunction) {
     try {
       res.cookie("candidateToken", "", {
         httpOnly: true,
@@ -124,17 +118,17 @@ class CandidateController {
       });
       res.status(200).json({ success: true });
     } catch (error) {
-      console.log(error);
+      next(error)
     }
   }
 
-  async home (req: Request, res: Response) {
+  async home (req: Request, res: Response, next: NextFunction) {
     try {
       const stacksList = await this.candidateCase.getAllStacks()
       console.log(stacksList)
       return res.status(200).json({success: true, data: {stacks: stacksList}})
     } catch (error) {
-      res.status(500).json({success: false, message: "Internal server error"})
+      next(error)
     }
   }
 
