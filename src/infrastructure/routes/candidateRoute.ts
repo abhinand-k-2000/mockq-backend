@@ -27,7 +27,9 @@ router.post('/logout', (req, res, next) => controller.logout(req, res, next))
 
 router.get('/home',candidateAuthenticate, (req, res, next) => controller.home(req, res, next))
 
+router.get('/get-interviewers', (req, res, next) => controller.getInterviewersByTech(req, res, next))
 
+router.get('/get-interviewer-slots-details/:interviewerId', (req, res, next) => controller.getInterviewerSlotsDetails(req, res, next))
 
 
 export default router   

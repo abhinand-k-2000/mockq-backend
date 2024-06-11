@@ -40,5 +40,11 @@ router.post('/verify-details', authenticate, uploadStorage.fields([
     { name: 'resume', maxCount: 1 }
 ]), (req, res, next) => controller.verifyDetails(req, res, next));
 
+router.get('/home', authenticate, (req, res, next) => controller.getInterviewerProfile(req, res, next))
 
-export default router
+router.post('/add-slot', authenticate, (req, res, next) => controller.addInterviewSlot(req, res, next))
+
+router.get('/get-slots', authenticate, (req, res, next) => controller.getInterviewSlots(req, res, next) )
+
+    
+export default router   

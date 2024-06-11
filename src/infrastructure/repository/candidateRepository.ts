@@ -1,7 +1,10 @@
 import Candidate from "../../domain/entitites/candidate";
+import { InterviewerRegistration } from "../../domain/entitites/interviewer";
 import Stack from "../../domain/entitites/stack";
-import ICandidateRepository from "../../interface/repositories/ICandidateRepository";
+import ICandidateRepository, { InterviewerBasic } from "../../interface/repositories/ICandidateRepository";
 import { CandidateModel } from "../database/candidateModel";
+import { InterviewSlotModel } from "../database/interviewSlotModel";
+import { InterviewerModel } from "../database/interviewerModel";
 import { StackModel } from "../database/stackModel";
 import AppError from "../utils/appError";
 
@@ -38,6 +41,77 @@ class CandidateRepository implements ICandidateRepository {
     }
     return stacks;
   }
-}
+
+
+ async getInterviewersByTech(techName: string): Promise<InterviewerBasic[] | null> {
+    const interviewersIdsList = await InterviewSlotModel.aggregate([
+      {
+        $unwind: "$slots",
+      },
+      {
+        $unwind: "$slots.schedule",
+      },
+      {
+        $match: {
+          $or: [
+            { "slots.schedule.title": { $regex: techName, $options: "i" } },
+            {
+              "slots.schedule.description": { $regex: techName, $options: "i" },
+            },
+          ],
+        },
+      },
+      {
+        $group: {
+          _id: "$interviewerId",
+        },
+      },
+    ]);
+
+    if (!interviewersIdsList)
+      throw new AppError("No interviews available", 404);
+
+    const interviewersIds = interviewersIdsList.map((item) => item._id);
+    console.log(interviewersIds);
+
+    const interviewersDetails = await InterviewerModel.find(
+      { _id: { $in: interviewersIds } },
+      {
+        name: 1,
+        profilePicture: 1,
+        introduction: 1,
+        currentDesigantion: 1,
+        organisation: 1,
+      }
+    );
+
+    return interviewersDetails;
+  }
+  
+
+  async getInterviewerSlotsDetails(interviewerId: string): Promise<any> {
+    
+    const interviewerDetails = await InterviewerModel.findById(interviewerId, {name: 1, currentDesignation: 1, organisation: 1, profilePicture: 1, yearsOfExperience: 1});
+    const interviewSlotDetails = await InterviewSlotModel.aggregate([
+      {
+        $match: {interviewerId: interviewerId}
+      },
+      {
+        $unwind: "$slots"
+      },
+      {
+        $unwind: "$slots.schedule"
+      }
+    ])
+
+    const details = {
+      interviewerDetails, interviewSlotDetails
+    }
+
+    return details
+  }
+
+  
+} 
 
 export default CandidateRepository;

@@ -10,6 +10,8 @@ import IHashPassword from "../interface/utils/IhashPassword";
 
 import IFileStorageService from "../interface/utils/IFileStorageService";
 import AppError from "../infrastructure/utils/appError";
+import Interview from "../domain/entitites/interviewSlot";
+import InterviewSlot from "../domain/entitites/interviewSlot";
 
 class InterviewerUseCase {
   constructor(
@@ -22,7 +24,6 @@ class InterviewerUseCase {
   ) {}
 
   async findInterviewer(interviewerInfo: InterviewerProfile) {
-    // try {
     const { email, name } = interviewerInfo;
     const interviewerFound = await this.iInterviewerRepository.findByEmail(
       email
@@ -39,9 +40,7 @@ class InterviewerUseCase {
     const token = this.jwtToken.otpToken(interviewerInfo, otp);
     await this.mailService.sendMail(name, email, otp);
     return { status: 201, data: token, message: "OTP generated" };
-    // } catch (error) {
-    //   console.log(error);
-    // }
+
   }
 
   async getInterviewerInfoUsingToken(token: string) {
@@ -167,6 +166,34 @@ class InterviewerUseCase {
       data: updatedInterviewer,
     };
   }
+
+  async getInterviewerProfile(interviewerId: string) {
+    const interviewer = this.iInterviewerRepository.findById(interviewerId)
+    if(!interviewer){
+        throw new AppError("Interviewer not found", 404)
+    }
+    return interviewer
+  }
+
+  async addSlot(slotData: InterviewSlot) {
+
+    const { interviewerId, slots } = slotData;
+    if (!interviewerId || !slots || !Array.isArray(slots) || slots.length === 0) {
+        throw new AppError("Invalid slot data", 400);
+    }
+    const slotAdded = await this.iInterviewerRepository.saveInterviewSlot(slotData);
+    return slotAdded;
+
+  }
+
+
+  async getInterviewSlots(interviewerId: string) {
+    const slotList = this.iInterviewerRepository.getInterviewSlots(interviewerId)
+    return slotList
+  }
+
+
+  
 }
 
 export default InterviewerUseCase;

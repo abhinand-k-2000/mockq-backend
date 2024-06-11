@@ -98,6 +98,16 @@ class CandidateUseCase {
     const stacksList = await this.iCandidateRepository.findAllStacks();
     return stacksList;
   }
+
+  getInterviewersByTech(techName: string) {
+    const interviewersList = this.iCandidateRepository.getInterviewersByTech(techName)
+    return interviewersList
+  }
+
+  getInterviewerSlotDetails(interviewerId: string) {
+    const details = this.iCandidateRepository.getInterviewerSlotsDetails(interviewerId)
+    return details
+  }
 }
 
 export default CandidateUseCase;

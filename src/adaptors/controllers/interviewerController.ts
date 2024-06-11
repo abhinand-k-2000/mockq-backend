@@ -3,6 +3,7 @@ import InterviewerUseCase from "../../use-cases/interviewerUseCase";
 import path from "path";
 import fs from "fs";
 import AppError from "../../infrastructure/utils/appError";
+import InterviewSlot from "../../domain/entitites/interviewSlot";
 
 // interface RequestModified extends Request {
 //     interviewerId?: string
@@ -58,13 +59,11 @@ class InterviewerController {
   async resendOtp(req: Request, res: Response, next: NextFunction) {
     try {
       const token = req.headers.authorization?.split(" ")[1];
-      if (!token)
-        throw new AppError("Unauthorized user", 401);
+      if (!token) throw new AppError("Unauthorized user", 401);
 
       const interviewerInfo =
         await this.interviewerCase.getInterviewerInfoUsingToken(token);
-      if (!interviewerInfo)
-        throw new AppError("No user found", 400);
+      if (!interviewerInfo) throw new AppError("No user found", 400);
 
       const response = await this.interviewerCase.findInterviewer(
         interviewerInfo
@@ -95,7 +94,9 @@ class InterviewerController {
       if (saveInterviewer.success) {
         const { token } = saveInterviewer.data;
         res.cookie("interviewerToken", token);
-        return res.status(201).json({ success: true, data: { token }, message: "OTP veified" });
+        return res
+          .status(201)
+          .json({ success: true, data: { token }, message: "OTP veified" });
       } else {
         throw new AppError("OTP not verified", 400);
       }
@@ -170,15 +171,16 @@ class InterviewerController {
           });
         });
 
-        return res
-          .status(200)
-          .json({
-            success: true,
-            message: "Interviewer details verified successfully",
-            data: updatedInterviewer,
-          });
+        return res.status(200).json({
+          success: true,
+          message: "Interviewer details verified successfully",
+          data: updatedInterviewer,
+        });
       } else {
-        throw new AppError("Interviewer not found or unable to update details", 404);
+        throw new AppError(
+          "Interviewer not found or unable to update details",
+          404
+        );
       }
     } catch (error) {
       next(error);
@@ -196,6 +198,78 @@ class InterviewerController {
       next(error);
     }
   }
+
+  async getInterviewerProfile(req: Request, res: Response, next: NextFunction) {
+    try {
+      const interviewerId = req.interviewerId;
+      if (!interviewerId) {
+        throw new AppError("Unauthorized user", 401);
+      }
+
+      const interviewerDetails =
+        await this.interviewerCase.getInterviewerProfile(interviewerId);
+      return res
+        .status(200)
+        .json({ success: true, data: { interviewer: interviewerDetails } });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async addInterviewSlot(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { date, description, timeFrom, timeTo, title, price } = req.body.slotData;
+      const interviewerId = req.interviewerId;
+
+      if (!interviewerId) {
+        throw new AppError("Unauthorized user", 401);
+      }
+   
+      const slotData: InterviewSlot = {
+        interviewerId,
+        slots: [
+          {
+            date: new Date(date),
+            schedule: [
+              {
+                description,
+                from: timeFrom,
+                to: timeTo,
+                title,
+                status: "open",
+                price,
+              },
+            ],
+          },
+        ],
+      };
+
+      const slotAdded = await this.interviewerCase.addSlot(slotData);
+      return res
+        .status(201)
+        .json({
+          success: true,
+          data: slotAdded,
+          message: "Slot added successfully",
+        });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getInterviewSlots(req: Request, res: Response, next: NextFunction) {
+
+    const interviewerId = req.interviewerId
+    if(!interviewerId){
+      throw new AppError("Unauthorized user", 401)
+    }
+    const slotsList = await this.interviewerCase.getInterviewSlots(interviewerId)
+    return res.status(200).json({success: true, data: slotsList, message: "Fetched interview slots list"})
+  }
+
+
+
+  
 }
 
 export default InterviewerController;

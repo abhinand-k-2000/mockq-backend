@@ -133,6 +133,33 @@ class CandidateController {
   }
 
 
+  async getInterviewersByTech(req: Request, res: Response, next: NextFunction) {
+    try {
+      const tech = req.query.tech
+      if (!tech || typeof tech!== 'string') {
+        throw new AppError("Technology required", 400);
+    }
+      console.log(tech)
+
+    const interviewersList = await this.candidateCase.getInterviewersByTech(tech)
+    return res.status(200).json({success: true, data: {interviewersList}})
+    } catch (error) {
+      next(error)
+    }
+
+  }
+
+  async getInterviewerSlotsDetails(req: Request, res: Response, next: NextFunction) {
+    try {
+      const {interviewerId} = req.params 
+
+      const details = await this.candidateCase.getInterviewerSlotDetails(interviewerId)
+      return res.status(200).json({success: true, data: {details}})
+    } catch (error) {
+      next(error)
+    }
+  }
+
 }   
 
 
