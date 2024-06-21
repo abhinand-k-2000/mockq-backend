@@ -125,7 +125,6 @@ class CandidateController {
   async home (req: Request, res: Response, next: NextFunction) {
     try {
       const stacksList = await this.candidateCase.getAllStacks()
-      console.log(stacksList)
       return res.status(200).json({success: true, data: {stacks: stacksList}})
     } catch (error) {
       next(error)
@@ -139,7 +138,6 @@ class CandidateController {
       if (!tech || typeof tech!== 'string') {
         throw new AppError("Technology required", 400);
     }
-      console.log(tech)
 
     const interviewersList = await this.candidateCase.getInterviewersByTech(tech)
     return res.status(200).json({success: true, data: {interviewersList}})
@@ -152,8 +150,12 @@ class CandidateController {
   async getInterviewerSlotsDetails(req: Request, res: Response, next: NextFunction) {
     try {
       const {interviewerId} = req.params 
+      const {techName} = req.query
 
-      const details = await this.candidateCase.getInterviewerSlotDetails(interviewerId)
+      if(!techName || typeof techName !== 'string') throw new AppError("Tech not found", 400)
+
+
+      const details = await this.candidateCase.getInterviewerSlotDetails(interviewerId, techName)
       return res.status(200).json({success: true, data: {details}})
     } catch (error) {
       next(error)

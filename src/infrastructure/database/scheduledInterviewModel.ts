@@ -41,4 +41,4 @@ const ScheduledInterviewModel = mongoose.model<ScheduledInterview>(
   ScheduledInterviewSchema
 );
 
-export {ScheduledInterviewModel}
+export {ScheduledInterviewModel}  

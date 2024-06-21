@@ -2,28 +2,31 @@ import mongoose from "mongoose";
 import InterviewSlot, { Slot, Schedule} from "../../domain/entitites/interviewSlot";
 
 const ScheduleSchema = new mongoose.Schema<Schedule>({
-  description: String,
-  from: Date,
-  to: Date,
-  title: String,
-  status: { type: String, enum: ["open", "booked"] },
-  price: Number,
+  description: { type: String, required: true },
+  from: { type: Date, required: true },
+  to: { type: Date, required: true },
+  title: { type: String, required: true },
+  status: { type: String, enum: ["open", "booked"], required: true },
+  price: { type: Number, required: true },
+  technologies: { type: [String], required: true } // Ensure technologies is an array of strings
 });
 
 const SlotSchema = new mongoose.Schema<Slot>({
-  date: Date,
-  schedule: [ScheduleSchema],
+  date: { type: Date, required: true },
+  schedule: { type: [ScheduleSchema], required: true }
 });
 
 const InterviewSlotSchema = new mongoose.Schema<InterviewSlot>({
-  interviewerId: String,
-  slots: [SlotSchema],
+  interviewerId: { type: String, required: true },
+  slots: { type: [SlotSchema], required: true }
 });
 
 const InterviewSlotModel = mongoose.model<InterviewSlot>(
   "InterviewSlot",
   InterviewSlotSchema
 );
+
+
 export { InterviewSlotModel };
 
 // const interviewSlotSchema: Schema<InterviewSlot> = new Schema({

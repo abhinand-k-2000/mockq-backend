@@ -192,6 +192,11 @@ class InterviewerUseCase {
     return slotList
   }
 
+  async getDomains() {
+    const domainList = this.iInterviewerRepository.getDomains();
+    return domainList;
+  }
+
 
   
 }

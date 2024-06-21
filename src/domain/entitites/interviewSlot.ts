@@ -5,6 +5,7 @@ export interface Schedule {
   title: string;
   status: "open" | "booked";
   price: number;
+  technologies: string[]
 }
 
 export interface Slot {

@@ -1,5 +1,6 @@
 import InterviewSlot from "../../domain/entitites/interviewSlot"
 import { InterviewerRegistration } from "../../domain/entitites/interviewer"
+import Stack from "../../domain/entitites/stack"
 
 
 interface IInterviewerRepository {
@@ -10,6 +11,7 @@ interface IInterviewerRepository {
     findById(id: string): Promise<InterviewerRegistration | null>
     saveInterviewSlot(slotData: InterviewSlot): Promise<InterviewSlot | null>
     getInterviewSlots(interviewerId: string): Promise<InterviewSlot[] | null>
+    getDomains():Promise<Stack[] | null>
 
 
 }

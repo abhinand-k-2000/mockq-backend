@@ -3,15 +3,17 @@ import InterviewSlot, {
   Schedule,
 } from "../../domain/entitites/interviewSlot";
 import { InterviewerRegistration } from "../../domain/entitites/interviewer";
+import Stack from "../../domain/entitites/stack";
 import IInterviewerRepository from "../../interface/repositories/IInterviewerRepository";
 import { InterviewSlotModel } from "../database/interviewSlotModel";
 import { InterviewerModel } from "../database/interviewerModel";
+import { StackModel } from "../database/stackModel";
 import AppError from "../utils/appError";
 
 class InterviewerRepository implements IInterviewerRepository {
   async findByEmail(email: string): Promise<InterviewerRegistration | null> {
     const interviewerFound = await InterviewerModel.findOne({ email: email });
-    if (!interviewerFound) throw new AppError("Interviewer not found", 404);
+    // if (!interviewerFound) throw new AppError("Interviewer not found", 404);
 
     return interviewerFound;
   }
@@ -60,10 +62,9 @@ class InterviewerRepository implements IInterviewerRepository {
   async saveInterviewSlot(slotData: InterviewSlot): Promise<InterviewSlot | null> {
     const { interviewerId, slots } = slotData;
 
-    const transformData = (
-      data: any[],
-      interviewerId: string
-    ): InterviewSlot => {
+
+    const transformData = (data: any[], interviewerId: string): InterviewSlot => {
+
       const slots: Slot[] = data.map((item) => ({
         date: new Date(item.date),
         schedule: item.schedule.map((scheduleItem: Schedule) => ({
@@ -73,6 +74,7 @@ class InterviewerRepository implements IInterviewerRepository {
           title: scheduleItem.title,
           status: scheduleItem.status as "open" | "booked",
           price: Number(scheduleItem.price),
+          technologies: scheduleItem.technologies
         })),
       }));
       return { interviewerId, slots };
@@ -84,7 +86,6 @@ class InterviewerRepository implements IInterviewerRepository {
     if (!interviewSlot) {
       interviewSlot = new InterviewSlotModel(transformedData);
     } else {
-
       transformedData.slots.forEach((newSlot) => {
         const existingSlotIndex = interviewSlot!.slots.findIndex(
           (slot) =>
@@ -109,8 +110,8 @@ class InterviewerRepository implements IInterviewerRepository {
                 newSchedule
               );
             } else {
-              throw new AppError("Time slot already taken", 400)
-            
+              throw new AppError("Time slot already taken", 400);
+
               interviewSlot!.slots[existingSlotIndex].schedule[
                 existingScheduleIndex!
               ] = newSchedule;
@@ -121,13 +122,12 @@ class InterviewerRepository implements IInterviewerRepository {
     }
 
     const savedSlot = await interviewSlot.save();
-    return savedSlot
+    return savedSlot;
   }
 
   async getInterviewSlots(
     interviewerId: string
   ): Promise<InterviewSlot[] | null> {
-
     const slotsList = await InterviewSlotModel.aggregate([
       {
         $match: { interviewerId: interviewerId.toString() },
@@ -139,16 +139,19 @@ class InterviewerRepository implements IInterviewerRepository {
         $project: {
           _id: 0,
           date: "$slots.date",
-          schedule: "$slots.schedule"
-        }
-      }
-     
-     
+          schedule: "$slots.schedule",
+        },
+      },
     ]);
 
     return slotsList;
   }
+
+  async getDomains(): Promise<Stack[] | null> {
+    const domainList = await StackModel.find();
+    if (!domainList) throw new AppError("Domains not found!", 400);
+    return domainList;
+  }
 }
 
 export default InterviewerRepository;
-

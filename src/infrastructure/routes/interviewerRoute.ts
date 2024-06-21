@@ -44,7 +44,9 @@ router.get('/home', authenticate, (req, res, next) => controller.getInterviewerP
 
 router.post('/add-slot', authenticate, (req, res, next) => controller.addInterviewSlot(req, res, next))
 
-router.get('/get-slots', authenticate, (req, res, next) => controller.getInterviewSlots(req, res, next) )
+router.get('/get-slots', authenticate, (req, res, next) => controller.getInterviewSlots(req, res, next))
+
+router.get('/get-domains', authenticate, (req, res, next) => controller.getDomains(req, res, next))
 
     
 export default router   

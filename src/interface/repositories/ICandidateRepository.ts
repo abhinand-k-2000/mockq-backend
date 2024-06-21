@@ -16,7 +16,7 @@ interface ICandidateRepository {
     findAllStacks(): Promise<Stack[]>
 
     getInterviewersByTech(techName: string):Promise<InterviewerBasic[] | null>
-    getInterviewerSlotsDetails(interviewerId: string): Promise<any>
+    getInterviewerSlotsDetails(interviewerId: string, techName: string): Promise<any>
 }
 
 export default ICandidateRepository

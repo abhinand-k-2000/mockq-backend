@@ -11,9 +11,9 @@ import AppError from "../utils/appError";
 class CandidateRepository implements ICandidateRepository {
   async findByEmail(email: string): Promise<Candidate | null> {
     const candidateExists = await CandidateModel.findOne({ email: email });
-    if (!candidateExists) {
-      throw new AppError("Candidate not found", 404);
-    }
+    // if (!candidateExists) {
+    //   throw new AppError("Candidate not found", 404);
+    // }
     return candidateExists;
   }
 
@@ -44,6 +44,7 @@ class CandidateRepository implements ICandidateRepository {
 
 
  async getInterviewersByTech(techName: string): Promise<InterviewerBasic[] | null> {
+
     const interviewersIdsList = await InterviewSlotModel.aggregate([
       {
         $unwind: "$slots",
@@ -58,39 +59,42 @@ class CandidateRepository implements ICandidateRepository {
             {
               "slots.schedule.description": { $regex: techName, $options: "i" },
             },
+            { "slots.schedule.technologies": { $in: [techName] } }
           ],
         },
       },
       {
         $group: {
-          _id: "$interviewerId",
+          _id: "$interviewerId",  
         },
       },
     ]);
+
 
     if (!interviewersIdsList)
       throw new AppError("No interviews available", 404);
 
     const interviewersIds = interviewersIdsList.map((item) => item._id);
-    console.log(interviewersIds);
+
 
     const interviewersDetails = await InterviewerModel.find(
       { _id: { $in: interviewersIds } },
       {
         name: 1,
         profilePicture: 1,
-        introduction: 1,
+        introduction: 1,  
         currentDesigantion: 1,
         organisation: 1,
       }
     );
 
+
     return interviewersDetails;
   }
   
 
-  async getInterviewerSlotsDetails(interviewerId: string): Promise<any> {
-    
+  async getInterviewerSlotsDetails(interviewerId: string, techName: string): Promise<any> {
+
     const interviewerDetails = await InterviewerModel.findById(interviewerId, {name: 1, currentDesignation: 1, organisation: 1, profilePicture: 1, yearsOfExperience: 1});
     const interviewSlotDetails = await InterviewSlotModel.aggregate([
       {
@@ -101,8 +105,20 @@ class CandidateRepository implements ICandidateRepository {
       },
       {
         $unwind: "$slots.schedule"
-      }
+      },
+      {
+        $match: {
+          $or: [
+            { "slots.schedule.title": { $regex: techName, $options: "i" } },
+            {
+              "slots.schedule.description": { $regex: techName, $options: "i" },
+            },
+            { "slots.schedule.technologies": { $in: [techName] } }
+          ],
+        },
+      },
     ])
+
 
     const details = {
       interviewerDetails, interviewSlotDetails

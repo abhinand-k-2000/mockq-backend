@@ -73,7 +73,6 @@ class CandidateUseCase {
     const candidateFound = await this.iCandidateRepository.findByEmail(email);
 
     if (!candidateFound) {
-      console.log("Inside cnadidata founf");
       throw new AppError("User not found!", 404);
     }
     const passwordMatch = await this.hashPassword.compare(
@@ -104,8 +103,8 @@ class CandidateUseCase {
     return interviewersList
   }
 
-  getInterviewerSlotDetails(interviewerId: string) {
-    const details = this.iCandidateRepository.getInterviewerSlotsDetails(interviewerId)
+  getInterviewerSlotDetails(interviewerId: string, techName: string) {
+    const details = this.iCandidateRepository.getInterviewerSlotsDetails(interviewerId, techName)
     return details
   }
 }

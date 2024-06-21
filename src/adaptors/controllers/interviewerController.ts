@@ -8,6 +8,10 @@ import InterviewSlot from "../../domain/entitites/interviewSlot";
 // interface RequestModified extends Request {
 //     interviewerId?: string
 // }
+interface Technology {
+  value: string;
+  label: string
+}
 
 class InterviewerController {
   constructor(private interviewerCase: InterviewerUseCase) {}
@@ -216,9 +220,12 @@ class InterviewerController {
     }
   }
 
+  
+
   async addInterviewSlot(req: Request, res: Response, next: NextFunction) {
     try {
-      const { date, description, timeFrom, timeTo, title, price } = req.body.slotData;
+      const { date, description, timeFrom, timeTo, title, price, technologies } = req.body.slotData;
+      const techs: string[] = (technologies as Technology[]).map((option: Technology) => option.value);
       const interviewerId = req.interviewerId;
 
       if (!interviewerId) {
@@ -238,6 +245,7 @@ class InterviewerController {
                 title,
                 status: "open",
                 price,
+                technologies: techs
               },
             ],
           },
@@ -259,12 +267,25 @@ class InterviewerController {
 
   async getInterviewSlots(req: Request, res: Response, next: NextFunction) {
 
-    const interviewerId = req.interviewerId
+    try {
+      const interviewerId = req.interviewerId
     if(!interviewerId){
       throw new AppError("Unauthorized user", 401)
     }
     const slotsList = await this.interviewerCase.getInterviewSlots(interviewerId)
     return res.status(200).json({success: true, data: slotsList, message: "Fetched interview slots list"})
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async getDomains(req: Request, res: Response, next: NextFunction) {
+    try {
+      const domainsList = await this.interviewerCase.getDomains()
+      return res.status(200).json({success: true, data: domainsList, message: "Fetched domains list"})
+    } catch (error) {
+      next(error)
+    }
   }
 
 
