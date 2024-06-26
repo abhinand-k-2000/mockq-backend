@@ -1,10 +1,14 @@
 import Candidate from "../../domain/entitites/candidate";
 import { InterviewerRegistration } from "../../domain/entitites/interviewer";
+import ScheduledInterview from "../../domain/entitites/scheduledInterview";
 import Stack from "../../domain/entitites/stack";
-import ICandidateRepository, { InterviewerBasic } from "../../interface/repositories/ICandidateRepository";
+import ICandidateRepository, {
+  InterviewerBasic,
+} from "../../interface/repositories/ICandidateRepository";
 import { CandidateModel } from "../database/candidateModel";
 import { InterviewSlotModel } from "../database/interviewSlotModel";
 import { InterviewerModel } from "../database/interviewerModel";
+import { ScheduledInterviewModel } from "../database/scheduledInterviewModel";
 import { StackModel } from "../database/stackModel";
 import AppError from "../utils/appError";
 
@@ -42,9 +46,9 @@ class CandidateRepository implements ICandidateRepository {
     return stacks;
   }
 
-
- async getInterviewersByTech(techName: string): Promise<InterviewerBasic[] | null> {
-
+  async getInterviewersByTech(
+    techName: string
+  ): Promise<InterviewerBasic[] | null> {
     const interviewersIdsList = await InterviewSlotModel.aggregate([
       {
         $unwind: "$slots",
@@ -59,52 +63,56 @@ class CandidateRepository implements ICandidateRepository {
             {
               "slots.schedule.description": { $regex: techName, $options: "i" },
             },
-            { "slots.schedule.technologies": { $in: [techName] } }
+            { "slots.schedule.technologies": { $in: [techName] } },
           ],
         },
       },
       {
         $group: {
-          _id: "$interviewerId",  
+          _id: "$interviewerId",
         },
       },
     ]);
-
 
     if (!interviewersIdsList)
       throw new AppError("No interviews available", 404);
 
     const interviewersIds = interviewersIdsList.map((item) => item._id);
 
-
     const interviewersDetails = await InterviewerModel.find(
       { _id: { $in: interviewersIds } },
       {
         name: 1,
         profilePicture: 1,
-        introduction: 1,  
+        introduction: 1,
         currentDesigantion: 1,
         organisation: 1,
       }
     );
 
-
     return interviewersDetails;
   }
-  
 
-  async getInterviewerSlotsDetails(interviewerId: string, techName: string): Promise<any> {
-
-    const interviewerDetails = await InterviewerModel.findById(interviewerId, {name: 1, currentDesignation: 1, organisation: 1, profilePicture: 1, yearsOfExperience: 1});
+  async getInterviewerSlotsDetails(
+    interviewerId: string,
+    techName: string
+  ): Promise<any> {
+    const interviewerDetails = await InterviewerModel.findById(interviewerId, {
+      name: 1,
+      currentDesignation: 1,
+      organisation: 1,
+      profilePicture: 1,
+      yearsOfExperience: 1,
+    });
     const interviewSlotDetails = await InterviewSlotModel.aggregate([
       {
-        $match: {interviewerId: interviewerId}
+        $match: { interviewerId: interviewerId },
       },
       {
-        $unwind: "$slots"
+        $unwind: "$slots",
       },
       {
-        $unwind: "$slots.schedule"
+        $unwind: "$slots.schedule",
       },
       {
         $match: {
@@ -113,21 +121,54 @@ class CandidateRepository implements ICandidateRepository {
             {
               "slots.schedule.description": { $regex: techName, $options: "i" },
             },
-            { "slots.schedule.technologies": { $in: [techName] } }
+            { "slots.schedule.technologies": { $in: [techName] } },
           ],
         },
       },
-    ])
-
+    ]);
 
     const details = {
-      interviewerDetails, interviewSlotDetails
-    }
+      interviewerDetails,
+      interviewSlotDetails,
+    };
 
-    return details
+    return details;
   }
 
-  
-} 
+  async bookSlot(info: any): Promise<void> {
+    const { interviewerId, _id, date, candidateId } = info;
+
+    try {
+      const slot = await InterviewSlotModel.findOneAndUpdate(
+        {
+          interviewerId: interviewerId,
+          "slots.date": date,
+          "slots.schedule._id": _id,
+        },
+        {
+          $set: { "slots.$[slotElem].schedule.$[schedElem].status": "booked" },
+        },
+        {
+          arrayFilters: [{ "slotElem.date": date }, { "schedElem._id": _id }],
+          new: true, // Return the updated document
+        }
+      );
+
+      return;
+    } catch (error) {
+      console.error("Error updating slot: ", error);
+      throw new Error("Failed to book slot");
+    }
+  }
+
+  async getScheduledInterviews(candidateId: string): Promise<ScheduledInterview[] | null> {
+    console.log(candidateId)
+    const interviewList = await ScheduledInterviewModel.find({candidateId: candidateId})
+    console.log(interviewList)
+
+    return interviewList 
+
+  }   
+}
 
 export default CandidateRepository;

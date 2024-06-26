@@ -16,6 +16,7 @@ class AdminController {
 
       if (admin?.success) {
         const expiryDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        
         res.cookie("adminToken", admin.token, {
           expires: expiryDate,
           httpOnly: true,

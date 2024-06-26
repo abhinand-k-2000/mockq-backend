@@ -7,6 +7,7 @@ interface ScheduledInterview {
     price: number;
     interviewerId: string;
     candidateId: string
+    status: string
 }
 
 

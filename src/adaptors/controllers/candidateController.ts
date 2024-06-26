@@ -162,6 +162,45 @@ class CandidateController {
     }
   }
 
+  // async bookSlot(req: Request, res: Response, next: NextFunction) {
+  //   try {
+  //     const data = req.body;
+
+  //     const candidateId = req.candidateId
+  //     console.log("canidate Id: ", candidateId)
+  //     console.log(req.body)
+
+  //   const { interviewerId, slots } = data.data;
+  //   const { schedule, date } = slots;
+  //   const { title, price, description, to, from, _id } = schedule;
+
+  //   const info = {
+  //       interviewerId, to, from, _id, date, candidateId, price, title, description
+  //   }
+
+  //   const bookSlot = await this.candidateCase.bookSlot(info)
+  //   return bookSlot
+  //   } catch (error) {
+  //     next(error)
+  //   }
+  // }
+
+
+  async getScheduledInterviewList(req: Request, res: Response, next: NextFunction) {
+    try {
+      const candidateId = req.candidateId;
+      if(!candidateId){
+        throw new AppError("Failed to get candidate id", 400)
+      }
+
+      const interviewList = await this.candidateCase.getScheduledInterviewList(candidateId)
+      console.log("controller: ", interviewList)
+      return res.status(200).json({success: true, data: interviewList})
+
+    } catch (error) {
+      next(error)
+    }
+  }
 }   
 
 

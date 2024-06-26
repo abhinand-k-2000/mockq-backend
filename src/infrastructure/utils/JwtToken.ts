@@ -11,7 +11,7 @@ class JwtToken implements IJwtToken{
 
   createJwtToken(id: string, role: string): string {
     const payload: JwtPayload = {id, role}
-    const token = jwt.sign(payload, this.secret, {expiresIn: '1hr'});
+    const token = jwt.sign(payload, this.secret, {expiresIn: '1d'});
     return token;   
   }                
 

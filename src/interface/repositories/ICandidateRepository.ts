@@ -1,5 +1,6 @@
 import Candidate from "../../domain/entitites/candidate"
 import { InterviewerRegistration } from "../../domain/entitites/interviewer"
+import ScheduledInterview from "../../domain/entitites/scheduledInterview";
 import Stack from "../../domain/entitites/stack"
 
 export interface InterviewerBasic{
@@ -17,6 +18,9 @@ interface ICandidateRepository {
 
     getInterviewersByTech(techName: string):Promise<InterviewerBasic[] | null>
     getInterviewerSlotsDetails(interviewerId: string, techName: string): Promise<any>
+
+    // bookSlot(info: any): Promise<void | null>
+    getScheduledInterviews(candidateId: string): Promise< ScheduledInterview[] | null >
 }
 
 export default ICandidateRepository

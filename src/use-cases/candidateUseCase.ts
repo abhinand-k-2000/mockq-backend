@@ -107,6 +107,23 @@ class CandidateUseCase {
     const details = this.iCandidateRepository.getInterviewerSlotsDetails(interviewerId, techName)
     return details
   }
+
+  // bookSlot(info: any) {
+  //   const { interviewerId, to, from, _id, date, candidateId} = info
+
+  //       const bookMarked = this.iCandidateRepository.bookSlot(info)
+  //       return bookMarked
+
+  // }
+
+  async getScheduledInterviewList (candidateId: string) {
+    try {
+      const interviewList = await this.iCandidateRepository.getScheduledInterviews(candidateId)
+      return interviewList
+    } catch (error) {
+      throw new AppError("Failed to fetch scheduled interviews", 500)
+    }
+  }
 }
 
 export default CandidateUseCase;

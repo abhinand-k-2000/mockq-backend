@@ -34,7 +34,12 @@ const ScheduledInterviewSchema = new Schema<ScheduledInterview>({
     type: String,
     required: true,
   },
-});
+  status: {
+    type: String,
+    enum: ['Scheduled', 'Completed', 'Cancelled'],
+    default: 'Scheduled'
+  }
+}, {timestamps: true});
 
 const ScheduledInterviewModel = mongoose.model<ScheduledInterview>(
   "SchduledInterview",

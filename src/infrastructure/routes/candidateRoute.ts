@@ -31,5 +31,8 @@ router.get('/get-interviewers', (req, res, next) => controller.getInterviewersBy
 
 router.get('/get-interviewer-slots-details/:interviewerId', (req, res, next) => controller.getInterviewerSlotsDetails(req, res, next))
 
+// router.put('/book-slot', (req, res, next) => controller.bookSlot(req, res, next))
+
+router.get('/get-scheduled-interviews', candidateAuthenticate, (req, res, next) => controller.getScheduledInterviewList(req, res, next))
 
 export default router   
