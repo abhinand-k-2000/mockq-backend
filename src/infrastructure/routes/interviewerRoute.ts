@@ -48,5 +48,10 @@ router.get('/get-slots', authenticate, (req, res, next) => controller.getIntervi
 
 router.get('/get-domains', authenticate, (req, res, next) => controller.getDomains(req, res, next))
 
+router.post('/forgot-password', (req, res, next) => controller.handleForgotPassword(req, res, next))
+
+
+router.post('/reset-password', (req, res, next) => controller.resetPassword(req, res, next))
+
     
 export default router   

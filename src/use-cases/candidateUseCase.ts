@@ -7,6 +7,13 @@ import IJwtToken from "../interface/utils/IJwtToken";
 import IMailService from "../interface/utils/IMailService";
 import IHashPassword from "../interface/utils/IhashPassword";
 
+type DecodedToken = {
+  info: { userId: string };
+  otp: string;
+  iat: number;
+  exp: number;
+}
+
 class CandidateUseCase {
   constructor(
     private iCandidateRepository: ICandidateRepository,
@@ -59,13 +66,18 @@ class CandidateUseCase {
     const hashedPassword = await this.hashPassword.hash(password);
     decodedToken.info.password = hashedPassword;
 
-    const candidateSave = await this.iCandidateRepository.saveCandidate(decodedToken.info);
+    const candidateSave = await this.iCandidateRepository.saveCandidate(
+      decodedToken.info
+    );
 
     if (!candidateSave) {
       throw new AppError("Failed to save candidate", 500);
     }
 
-    let newToken = this.jwtToken.createJwtToken(candidateSave._id as string, "candidate");
+    let newToken = this.jwtToken.createJwtToken(
+      candidateSave._id as string,
+      "candidate"
+    );
     return { success: true, token: newToken };
   }
 
@@ -90,7 +102,11 @@ class CandidateUseCase {
 
     let token = this.jwtToken.createJwtToken(candidateFound._id, "candidate");
 
-    return {success: true, data: { token: token }, message: "candidate found"};
+    return {
+      success: true,
+      data: { token: token },
+      message: "candidate found",
+    };
   }
 
   async getAllStacks() {
@@ -99,13 +115,17 @@ class CandidateUseCase {
   }
 
   getInterviewersByTech(techName: string) {
-    const interviewersList = this.iCandidateRepository.getInterviewersByTech(techName)
-    return interviewersList
+    const interviewersList =
+      this.iCandidateRepository.getInterviewersByTech(techName);
+    return interviewersList;
   }
 
   getInterviewerSlotDetails(interviewerId: string, techName: string) {
-    const details = this.iCandidateRepository.getInterviewerSlotsDetails(interviewerId, techName)
-    return details
+    const details = this.iCandidateRepository.getInterviewerSlotsDetails(
+      interviewerId,
+      techName
+    );
+    return details;
   }
 
   // bookSlot(info: any) {
@@ -116,14 +136,58 @@ class CandidateUseCase {
 
   // }
 
-  async getScheduledInterviewList (candidateId: string) {
+  async getScheduledInterviewList(candidateId: string) {
     try {
-      const interviewList = await this.iCandidateRepository.getScheduledInterviews(candidateId)
-      return interviewList
+      const interviewList =
+        await this.iCandidateRepository.getScheduledInterviews(candidateId);
+      return interviewList;
     } catch (error) {
-      throw new AppError("Failed to fetch scheduled interviews", 500)
+      throw new AppError("Failed to fetch scheduled interviews", 500);
     }
+  }
+
+  async initiatePasswordReset(email: string) {
+    try {
+      const candidate = await this.iCandidateRepository.findByEmail(email);
+      if (!candidate) {
+        return null
+      }
+      const { name } = candidate;
+      const otp = this.otpGenerate.generateOtp();
+      const hashedOtp = await this.hashPassword.hash(otp)
+      console.log("FORGOT PASSWORD OTP: ", otp) 
+      const token = this.jwtToken.otpToken({ userId: candidate._id }, hashedOtp);
+
+      await this.mailService.sendMail(name, email, otp);
+
+
+      return token;
+    } catch (error) {
+      throw new AppError("Failed to initiate password reset", 500);
+    }
+  }
+
+  
+
+  async resetPassword(UserOtp: string, password: string, token: any) {
+    const decodedToken = this.jwtToken.verifyJwtToken(token) as DecodedToken
+    const {otp, info}  = decodedToken
+    const {userId} = info
+    
+    const isOtpValid = await this.hashPassword.compare(UserOtp, otp)
+    if(!isOtpValid){
+      throw new AppError("Incorrect OTP", 400)
+    }
+    const hashedPassword = await this.hashPassword.hash(password)
+
+    await this.iCandidateRepository.updatePassword(userId, hashedPassword)
+
+    return 
+
   }
 }
 
+
+
 export default CandidateUseCase;
+

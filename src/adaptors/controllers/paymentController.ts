@@ -11,7 +11,7 @@ class PaymentController {
     try {
       const data = req.body;
       const candidateId = req.candidateId?.toString();
-      console.log("Candidate ID in makePayment: ", candidateId); // Log the candidateId
+      // console.log("Candidate ID in makePayment: ", candidateId); // Log the candidateId
 
 
       const { interviewerId, slots } = data.data;

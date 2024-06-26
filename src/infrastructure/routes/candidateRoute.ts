@@ -35,4 +35,8 @@ router.get('/get-interviewer-slots-details/:interviewerId', (req, res, next) => 
 
 router.get('/get-scheduled-interviews', candidateAuthenticate, (req, res, next) => controller.getScheduledInterviewList(req, res, next))
 
+router.post('/forgot-password', (req, res, next) => controller.handleForgotPassword(req, res, next))
+
+router.post('/reset-password', (req, res, next) => controller.resetPassword(req, res, next))
+
 export default router   

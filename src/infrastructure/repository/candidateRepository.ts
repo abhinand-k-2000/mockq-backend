@@ -169,6 +169,13 @@ class CandidateRepository implements ICandidateRepository {
     return interviewList 
 
   }   
+
+  async updatePassword(candidateId: string, password: string): Promise<void | null> {
+      await CandidateModel.findByIdAndUpdate(candidateId, {
+        password: password
+      })
+
+  }
 }
 
 export default CandidateRepository;

@@ -1,6 +1,8 @@
 import jwt, {JwtPayload} from "jsonwebtoken";
 import IJwtToken from "../../interface/utils/IJwtToken";
 
+
+
 class JwtToken implements IJwtToken{
 
   private secret: string

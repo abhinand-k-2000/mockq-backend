@@ -288,6 +288,35 @@ class InterviewerController {
     }
   }
 
+  async handleForgotPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log("inside contoroller")
+      const {email} = req.body
+      console.log(email)
+      const token = await this.interviewerCase.initiatePasswordReset(email)
+      if (!token) {
+        return res.status(404).json({ success: false, message: "User not found" });
+      }
+      return res.status(200).json({success: true, data: token})
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async resetPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const token = req.headers.authorization?.split(' ')[1] as string;
+      if(!token) throw new AppError("Unauthorised user", 401);
+
+      const {otp, password} = req.body
+      await this.interviewerCase.resetPassword(otp, password, token)
+      return res.status(201).json({success: true, message: "Password changed successfully"})
+      
+    } catch (error) {
+      next(error)
+    }
+  }
+
 
 
   

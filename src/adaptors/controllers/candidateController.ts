@@ -1,6 +1,6 @@
 import AppError from "../../infrastructure/utils/appError";
 import CandidateUseCase from "../../use-cases/candidateUseCase";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, response } from "express";
 
 
 class CandidateController {
@@ -194,9 +194,38 @@ class CandidateController {
       }
 
       const interviewList = await this.candidateCase.getScheduledInterviewList(candidateId)
-      console.log("controller: ", interviewList)
+      // console.log("controller: ", interviewList)
       return res.status(200).json({success: true, data: interviewList})
 
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async handleForgotPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log("inside contoroller")
+      const {email} = req.body
+      console.log(email)
+      const token = await this.candidateCase.initiatePasswordReset(email)
+      if (!token) {
+        return res.status(404).json({ success: false, message: "User not found" });
+      }
+      return res.status(200).json({success: true, data: token})
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async resetPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const token = req.headers.authorization?.split(' ')[1] as string;
+      if(!token) throw new AppError("Unauthorised user", 401);
+
+      const {otp, password} = req.body
+      await this.candidateCase.resetPassword(otp, password, token)
+      return res.status(201).json({success: true, message: "Password changed successfully"})
+      
     } catch (error) {
       next(error)
     }

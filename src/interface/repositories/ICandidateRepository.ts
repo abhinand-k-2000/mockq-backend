@@ -21,6 +21,8 @@ interface ICandidateRepository {
 
     // bookSlot(info: any): Promise<void | null>
     getScheduledInterviews(candidateId: string): Promise< ScheduledInterview[] | null >
+
+    updatePassword(candidateId: string, password: string): Promise<void | null> 
 }
 
-export default ICandidateRepository
+export default ICandidateRepository  

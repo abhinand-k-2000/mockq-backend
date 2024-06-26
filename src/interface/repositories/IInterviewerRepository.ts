@@ -13,6 +13,8 @@ interface IInterviewerRepository {
     getInterviewSlots(interviewerId: string): Promise<InterviewSlot[] | null>
     getDomains():Promise<Stack[] | null>
 
+    updatePassword(interviewerId: string, password: string): Promise<void | null>
+
 
 }
 

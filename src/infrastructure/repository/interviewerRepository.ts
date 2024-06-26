@@ -152,6 +152,16 @@ class InterviewerRepository implements IInterviewerRepository {
     if (!domainList) throw new AppError("Domains not found!", 400);
     return domainList;
   }
+
+  async updatePassword(interivewerId: string, password: string): Promise<void | null> {
+    console.log("inside repo'''''''", interivewerId, password)
+    await InterviewerModel.findByIdAndUpdate(interivewerId, {
+      password: password
+    })
+
+}
+
+
 }
 
 export default InterviewerRepository;

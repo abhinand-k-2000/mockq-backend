@@ -15,7 +15,7 @@ class StripePayment {
             // const {title, price, description} = info
             const { interviewerId, to, from, _id, date, candidateId, price, title, description } = info;
             // const { schedule} = slots;
-            console.log("candidateID: ", candidateId)
+            // console.log("candidateID: ", candidateId)
             // const {title, price, description} = schedule
 
             const session = await stripe.checkout.sessions.create({
