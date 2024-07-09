@@ -38,6 +38,10 @@ const ScheduledInterviewSchema = new Schema<ScheduledInterview>({
     type: String,
     enum: ['Scheduled', 'Completed', 'Cancelled'],
     default: 'Scheduled'
+  },
+  roomId: {
+    type: String,
+    required: true
   }
 }, {timestamps: true});
 

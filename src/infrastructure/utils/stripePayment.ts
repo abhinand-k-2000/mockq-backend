@@ -13,7 +13,7 @@ class StripePayment {
     makePayment = async (info: any) => {
         try {
             // const {title, price, description} = info
-            const { interviewerId, to, from, _id, date, candidateId, price, title, description } = info;
+            const { interviewerId, to, from, _id, date, candidateId, price, title, description, roomId } = info;
             // const { schedule} = slots;
             // console.log("candidateID: ", candidateId)
             // const {title, price, description} = schedule
@@ -37,9 +37,8 @@ class StripePayment {
               ],
               success_url: `http://localhost:5173/candidate/payment-success`,
               cancel_url: `http://localhost:5173/candidate/payment-failed`,
-              metadata: { interviewerId, to, from, _id, date, candidateId, price, title, description }
+              metadata: { interviewerId, to, from, _id, date, candidateId, price, title, description, roomId }
             });
-            // console.log("SESSION INSIDE STRIPE: ", session)
             return session.url
             // return session.id
           } catch (error) {

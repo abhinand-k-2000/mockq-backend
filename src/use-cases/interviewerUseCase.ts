@@ -12,6 +12,8 @@ import IFileStorageService from "../interface/utils/IFileStorageService";
 import AppError from "../infrastructure/utils/appError";
 import Interview from "../domain/entitites/interviewSlot";
 import InterviewSlot from "../domain/entitites/interviewSlot";
+import ScheduledInterview from "../domain/entitites/scheduledInterview";
+import Feedback from "../domain/entitites/feedBack";
 
 type DecodedToken = {
   info: { userId: string };
@@ -236,13 +238,36 @@ class InterviewerUseCase {
       throw new AppError("Incorrect OTP", 400)
     }
     const hashedPassword = await this.hashPassword.hash(password)
-    console.log(hashedPassword)
 
-    await this.iInterviewerRepository.updatePassword(userId, hashedPassword)
+    await this.iInterviewerRepository.updatePassword(userId, hashedPassword) 
 
     return 
 
   }
+
+  async getScheduledInterviews(interviewerId: string) {
+
+      const list: ScheduledInterview[] = await this.iInterviewerRepository.getScheduledInterviews(interviewerId)
+      return list
+  }
+
+  async getDetails(interviewerId: string) {
+    const details = await this.iInterviewerRepository.findInterviewerById(interviewerId)
+    return details
+  }
+
+  async getScheduledInterviewById (interviewId: object) {
+    const interview = await this.iInterviewerRepository.getScheduledInterviewById(interviewId)
+    return interview
+  }
+
+
+  async saveFeedback(feedbacKDetails: Feedback) {
+    await this.iInterviewerRepository.saveFeedback(feedbacKDetails)
+  }
+
+
+
 
 
 

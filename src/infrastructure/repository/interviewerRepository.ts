@@ -1,12 +1,16 @@
+import Feedback from "../../domain/entitites/feedBack";
 import InterviewSlot, {
   Slot,
   Schedule,
 } from "../../domain/entitites/interviewSlot";
 import { InterviewerRegistration } from "../../domain/entitites/interviewer";
+import ScheduledInterview from "../../domain/entitites/scheduledInterview";
 import Stack from "../../domain/entitites/stack";
 import IInterviewerRepository from "../../interface/repositories/IInterviewerRepository";
+import { FeedBackModel } from "../database/feedBackModel";
 import { InterviewSlotModel } from "../database/interviewSlotModel";
 import { InterviewerModel } from "../database/interviewerModel";
+import { ScheduledInterviewModel } from "../database/scheduledInterviewModel";
 import { StackModel } from "../database/stackModel";
 import AppError from "../utils/appError";
 
@@ -32,7 +36,7 @@ class InterviewerRepository implements IInterviewerRepository {
   async findInterviewerById(
     id: string
   ): Promise<InterviewerRegistration | null> {
-    const interviewerData = await InterviewerModel.findById(id);
+    const interviewerData = await InterviewerModel.findById(id, "-password");
     if (!interviewerData) {
       throw new AppError("Interviewer not found", 404);
     }
@@ -59,12 +63,15 @@ class InterviewerRepository implements IInterviewerRepository {
     return interivewer;
   }
 
-  async saveInterviewSlot(slotData: InterviewSlot): Promise<InterviewSlot | null> {
+  async saveInterviewSlot(
+    slotData: InterviewSlot
+  ): Promise<InterviewSlot | null> {
     const { interviewerId, slots } = slotData;
 
-
-    const transformData = (data: any[], interviewerId: string): InterviewSlot => {
-
+    const transformData = (
+      data: any[],
+      interviewerId: string
+    ): InterviewSlot => {
       const slots: Slot[] = data.map((item) => ({
         date: new Date(item.date),
         schedule: item.schedule.map((scheduleItem: Schedule) => ({
@@ -74,7 +81,7 @@ class InterviewerRepository implements IInterviewerRepository {
           title: scheduleItem.title,
           status: scheduleItem.status as "open" | "booked",
           price: Number(scheduleItem.price),
-          technologies: scheduleItem.technologies
+          technologies: scheduleItem.technologies,
         })),
       }));
       return { interviewerId, slots };
@@ -153,15 +160,110 @@ class InterviewerRepository implements IInterviewerRepository {
     return domainList;
   }
 
-  async updatePassword(interivewerId: string, password: string): Promise<void | null> {
-    console.log("inside repo'''''''", interivewerId, password)
-    await InterviewerModel.findByIdAndUpdate(interivewerId, {
-      password: password
+  async updatePassword(
+    interivewerId: string,
+    password: string
+  ): Promise<void | null> {
+     await InterviewerModel.findByIdAndUpdate(interivewerId, {
+      password: password,
+    });
+  }
+
+  async getScheduledInterviews(
+    interviewerId: string
+  ): Promise<ScheduledInterview[]> {
+    const list = await ScheduledInterviewModel.find({
+      interviewerId: interviewerId,
+    });
+    if (!list) throw new AppError("Interviews are not scheduled", 404);
+    return list;
+  }
+
+  async getScheduledInterviewById(
+    interviewId: object
+  ): Promise<ScheduledInterview[] | null> {
+    // const interview = await ScheduledInterviewModel.aggregate([
+    //   {
+    //     $match: {_id: interviewId}
+    //   }, {
+    //     $lookup: {
+    //       from: "interviewers",
+    //       localField: "interviewerId",
+    //       foreignField: "_id",
+    //       as: 'interviewer'
+    //     }
+    //   }
+    // ])
+    const interview = await ScheduledInterviewModel.aggregate([
+      {
+        $match: { _id: interviewId }, // Use interviewId directly as a string
+      },
+      {
+        $lookup: {
+          from: "interviewers",
+          let: { interviewerId: { $toObjectId: "$interviewerId" } }, // Convert interviewerId to ObjectId
+          pipeline: [
+            { $match: { $expr: { $eq: ["$_id", "$$interviewerId"] } } },
+            { $project: { name: 1, profilePicture: 1 } },
+          ],
+          as: "interviewer",
+        },
+      },
+      { $unwind: "$interviewer" },
+      {
+        $lookup: {
+          from: "candidates",
+          let: { candidateId: { $toObjectId: "$candidateId" } },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$_id", "$$candidateId"] } } },
+            { $project: { name: 1, email: 1, mobile: 1 } },
+          ],
+          as: "candidate",
+        },
+      },
+      {
+        $unwind: "$candidate",
+      },
+    ]);
+
+    return interview[0];
+  }
+
+  async saveFeedback(feedbackDetails: Feedback): Promise<void > {
+    const {
+      interviewId,
+      interviewerId,
+      candidateId,
+      technicalSkills,
+      communicationSkills,
+      problemSolvingSkills,
+      strength,    
+      areaOfImprovement,
+      additionalComments,     
+    } = feedbackDetails;     
+
+    const feedback = new FeedBackModel({
+      interviewId,
+      interviewerId,
+      candidateId,
+      technicalSkills,
+      communicationSkills,
+      problemSolvingSkills,
+      strength,
+      areaOfImprovement,
+      additionalComments,
+    });
+
+    await feedback.save()
+
+    const statusUpated = await ScheduledInterviewModel.findByIdAndUpdate(interviewId, {
+      status: "Completed"
     })
 
-}
+    
 
 
+  }
 }
 
 export default InterviewerRepository;

@@ -8,9 +8,9 @@ class PaymentUseCase {
   ) {}
 
   async makePayment(info: any) {
-
+    console.log("Inside make payment: ", info)
+    
     const response = await this.stripePayment.makePayment(info);
-    // console.log("Inside usecase respnose: ", response);  
     if (!response) {
       throw new AppError("Payment failed", 500);
     }

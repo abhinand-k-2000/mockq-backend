@@ -53,5 +53,22 @@ router.post('/forgot-password', (req, res, next) => controller.handleForgotPassw
 
 router.post('/reset-password', (req, res, next) => controller.resetPassword(req, res, next))
 
+router.get('/get-scheduled-interviews', authenticate, (req, res, next) => controller.getScheduledInterviews(req, res, next))
+
+router.get('/get-details', authenticate, (req, res, next) => controller.getDetails(req, res, next))
+
+router.get('/get-scheduled-interview-by-id', authenticate, (req, res, next) => controller.getScheduledInterviewById(req, res, next))
+
+router.post('/give-feedback', authenticate, (req, res,next) => controller.saveFeedbackDetails(req, res, next))
+
+
+
+
+    
+
+
+
+
+
     
 export default router   

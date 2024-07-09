@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import PaymentUseCase from "../../use-cases/paymentUseCase";
 import Stripe from "stripe";
+import {v4 as uuidv4} from 'uuid'
+
 
 const stripe = new Stripe(process.env.STRIPE_API_SECRET || "");
 
@@ -11,12 +13,13 @@ class PaymentController {
     try {
       const data = req.body;
       const candidateId = req.candidateId?.toString();
-      // console.log("Candidate ID in makePayment: ", candidateId); // Log the candidateId
 
 
       const { interviewerId, slots } = data.data;
       const { schedule, date } = slots;
       const { title, price, description, to, from, _id } = schedule;
+
+      const roomId = uuidv4()
 
       const info = {
         interviewerId,
@@ -28,9 +31,9 @@ class PaymentController {
         price,
         title,
         description,
+        roomId
       };
 
-      // console.log(schedule)
       const response = await this.paymentCase.makePayment(info);
       return res.status(200).json({ success: true, data: response });
     } catch (error) {
@@ -39,14 +42,12 @@ class PaymentController {
   }
 
   async handleWebhook(req: Request, res: Response, next: NextFunction) {
-    console.log("Inside webhook");
 
     const endpointSecret =
       "whsec_e31411d4c8b0d765cd62b1e71d632bc38726b1142487eb8bd4f1f1a21cd1ce59";
     const sig: any = req.headers["stripe-signature"];
 
     let event;
-    console.log("REQUEST: ", req.body);
 
     try {
       event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);

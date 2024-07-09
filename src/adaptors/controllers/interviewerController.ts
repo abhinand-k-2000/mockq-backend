@@ -4,13 +4,14 @@ import path from "path";
 import fs from "fs";
 import AppError from "../../infrastructure/utils/appError";
 import InterviewSlot from "../../domain/entitites/interviewSlot";
+import mongoose from "mongoose";
 
 // interface RequestModified extends Request {
 //     interviewerId?: string
 // }
 interface Technology {
   value: string;
-  label: string
+  label: string;
 }
 
 class InterviewerController {
@@ -220,18 +221,26 @@ class InterviewerController {
     }
   }
 
-  
-
   async addInterviewSlot(req: Request, res: Response, next: NextFunction) {
     try {
-      const { date, description, timeFrom, timeTo, title, price, technologies } = req.body.slotData;
-      const techs: string[] = (technologies as Technology[]).map((option: Technology) => option.value);
+      const {
+        date,
+        description,
+        timeFrom,
+        timeTo,
+        title,
+        price,
+        technologies,
+      } = req.body.slotData;
+      const techs: string[] = (technologies as Technology[]).map(
+        (option: Technology) => option.value
+      );
       const interviewerId = req.interviewerId;
 
       if (!interviewerId) {
         throw new AppError("Unauthorized user", 401);
       }
-   
+
       const slotData: InterviewSlot = {
         interviewerId,
         slots: [
@@ -245,7 +254,7 @@ class InterviewerController {
                 title,
                 status: "open",
                 price,
-                technologies: techs
+                technologies: techs,
               },
             ],
           },
@@ -253,73 +262,134 @@ class InterviewerController {
       };
 
       const slotAdded = await this.interviewerCase.addSlot(slotData);
-      return res
-        .status(201)
-        .json({
-          success: true,
-          data: slotAdded,
-          message: "Slot added successfully",
-        });
+      return res.status(201).json({
+        success: true,
+        data: slotAdded,
+        message: "Slot added successfully",
+      });
     } catch (error) {
       next(error);
     }
   }
 
   async getInterviewSlots(req: Request, res: Response, next: NextFunction) {
-
     try {
-      const interviewerId = req.interviewerId
-    if(!interviewerId){
-      throw new AppError("Unauthorized user", 401)
-    }
-    const slotsList = await this.interviewerCase.getInterviewSlots(interviewerId)
-    return res.status(200).json({success: true, data: slotsList, message: "Fetched interview slots list"})
+      const interviewerId = req.interviewerId;
+      if (!interviewerId) {
+        throw new AppError("Unauthorized user", 401);
+      }
+      const slotsList = await this.interviewerCase.getInterviewSlots(
+        interviewerId
+      );
+      return res
+        .status(200)
+        .json({
+          success: true,
+          data: slotsList,
+          message: "Fetched interview slots list",
+        });
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
   async getDomains(req: Request, res: Response, next: NextFunction) {
     try {
-      const domainsList = await this.interviewerCase.getDomains()
-      return res.status(200).json({success: true, data: domainsList, message: "Fetched domains list"})
+      const domainsList = await this.interviewerCase.getDomains();
+      return res
+        .status(200)
+        .json({
+          success: true,
+          data: domainsList,
+          message: "Fetched domains list",
+        });
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
   async handleForgotPassword(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log("inside contoroller")
-      const {email} = req.body
-      console.log(email)
-      const token = await this.interviewerCase.initiatePasswordReset(email)
+      const { email } = req.body;
+      console.log(email);
+      const token = await this.interviewerCase.initiatePasswordReset(email);
       if (!token) {
-        return res.status(404).json({ success: false, message: "User not found" });
+        return res
+          .status(404)
+          .json({ success: false, message: "User not found" });
       }
-      return res.status(200).json({success: true, data: token})
+      return res.status(200).json({ success: true, data: token });
     } catch (error) {
-      next(error)
+      next(error);
     }
   }
 
   async resetPassword(req: Request, res: Response, next: NextFunction) {
     try {
-      const token = req.headers.authorization?.split(' ')[1] as string;
-      if(!token) throw new AppError("Unauthorised user", 401);
+      const token = req.headers.authorization?.split(" ")[1] as string;
+      if (!token) throw new AppError("Unauthorised user", 401);
 
-      const {otp, password} = req.body
-      await this.interviewerCase.resetPassword(otp, password, token)
-      return res.status(201).json({success: true, message: "Password changed successfully"})
-      
+      const { otp, password } = req.body;
+      await this.interviewerCase.resetPassword(otp, password, token);
+      return res
+        .status(201)
+        .json({ success: true, message: "Password changed successfully" });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getScheduledInterviews(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const interviewerId = req.interviewerId;
+      if (!interviewerId) throw new AppError("Interviewer not found", 400);
+      const scheduledInterviews =
+        await this.interviewerCase.getScheduledInterviews(interviewerId);
+      return res.status(200).json({ success: true, data: scheduledInterviews });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getDetails(req: Request, res: Response, next: NextFunction) {
+    const interviewerId = req.interviewerId;
+    if (!interviewerId) throw new AppError("Interviewer id not found", 400);
+    
+    const details = await this.interviewerCase.getDetails(interviewerId);
+
+    return res.status(200).json({ success: true, data: details });
+  }
+
+
+
+
+  async getScheduledInterviewById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const {interviewId} = req.query
+      if(!interviewId || typeof interviewId !== 'string') throw new AppError("Interview Id missing or invalid ", 400)
+      let id = new mongoose.Types.ObjectId(interviewId)
+    const interview = await this.interviewerCase.getScheduledInterviewById(id)
+    return res.status(200).json({success: true, data: interview})
     } catch (error) {
       next(error)
     }
   }
 
-
-
-  
+  async saveFeedbackDetails(req: Request, res: Response, next: NextFunction) {
+    try {
+      const {fullDetails} = req.body
+      console.log(req.body)
+      console.log(fullDetails)
+      const feedBack = await this.interviewerCase.saveFeedback(fullDetails);
+      return res.status(201).json({success: true, message: "Feedback uploaded successfully"})
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 export default InterviewerController;

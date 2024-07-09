@@ -1,4 +1,5 @@
 import Candidate from "../../domain/entitites/candidate";
+import Feedback from "../../domain/entitites/feedBack";
 import { InterviewerRegistration } from "../../domain/entitites/interviewer";
 import ScheduledInterview from "../../domain/entitites/scheduledInterview";
 import Stack from "../../domain/entitites/stack";
@@ -6,6 +7,7 @@ import ICandidateRepository, {
   InterviewerBasic,
 } from "../../interface/repositories/ICandidateRepository";
 import { CandidateModel } from "../database/candidateModel";
+import { FeedBackModel } from "../database/feedBackModel";
 import { InterviewSlotModel } from "../database/interviewSlotModel";
 import { InterviewerModel } from "../database/interviewerModel";
 import { ScheduledInterviewModel } from "../database/scheduledInterviewModel";
@@ -162,9 +164,7 @@ class CandidateRepository implements ICandidateRepository {
   }
 
   async getScheduledInterviews(candidateId: string): Promise<ScheduledInterview[] | null> {
-    console.log(candidateId)
     const interviewList = await ScheduledInterviewModel.find({candidateId: candidateId})
-    console.log(interviewList)
 
     return interviewList 
 
@@ -175,6 +175,52 @@ class CandidateRepository implements ICandidateRepository {
         password: password
       })
 
+  }
+
+
+  async getFeedbackDetails(interviewId: string): Promise<Feedback | null> {
+
+    
+    const feedback = await FeedBackModel.aggregate([
+      {
+        $match: {interviewId: interviewId}
+      }, {
+        $lookup: {
+          from: "interviewers",
+          let: {interviewerId: {$toObjectId: "$interviewerId"}},
+          pipeline: [
+            {$match: {$expr: {$eq: ["$_id", "$$interviewerId"]}}},
+            {$project: {name: 1}}
+          ],
+          as: "interviewer"
+        }
+      },
+      {
+        $unwind: "$interviewer"
+      },
+      {
+        $lookup: {
+          from: "candidates",
+          let: {candidateId: {$toObjectId: "$candidateId"}},
+          pipeline: [
+            {$match: {$expr: {$eq: ["$_id", "$$candidateId"]}}},  
+            {$project: {name: 1}}
+          ],
+          as: "candidate"
+        }
+      },{
+        $unwind: "$candidate"
+      }
+    ])
+
+
+    return feedback[0]
+  }
+
+
+  async scehduledInterviewDetails(interviewId: string): Promise<ScheduledInterview | null> {
+      const interviewDetails = await ScheduledInterviewModel.findById(interviewId)
+      return interviewDetails
   }
 }
 

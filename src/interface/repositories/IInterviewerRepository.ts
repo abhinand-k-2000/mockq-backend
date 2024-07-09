@@ -1,5 +1,7 @@
+import Feedback from "../../domain/entitites/feedBack"
 import InterviewSlot from "../../domain/entitites/interviewSlot"
 import { InterviewerRegistration } from "../../domain/entitites/interviewer"
+import ScheduledInterview from "../../domain/entitites/scheduledInterview"
 import Stack from "../../domain/entitites/stack"
 
 
@@ -15,6 +17,11 @@ interface IInterviewerRepository {
 
     updatePassword(interviewerId: string, password: string): Promise<void | null>
 
+    getScheduledInterviews(interviewerId: string): Promise<ScheduledInterview[] >
+
+    getScheduledInterviewById(interviewId: object): Promise<ScheduledInterview[] | null>
+
+    saveFeedback(feedbackDetails: Feedback): Promise<void >
 
 }
 

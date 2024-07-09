@@ -1,4 +1,5 @@
 import Candidate from "../../domain/entitites/candidate"
+import Feedback from "../../domain/entitites/feedBack";
 import { InterviewerRegistration } from "../../domain/entitites/interviewer"
 import ScheduledInterview from "../../domain/entitites/scheduledInterview";
 import Stack from "../../domain/entitites/stack"
@@ -23,6 +24,10 @@ interface ICandidateRepository {
     getScheduledInterviews(candidateId: string): Promise< ScheduledInterview[] | null >
 
     updatePassword(candidateId: string, password: string): Promise<void | null> 
+
+    getFeedbackDetails(interviewId: string): Promise<Feedback | null>
+
+    scehduledInterviewDetails(interviewId: string): Promise<ScheduledInterview | null>
 }
 
 export default ICandidateRepository  

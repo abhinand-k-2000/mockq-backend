@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import AppError from "../../infrastructure/utils/appError";
 import CandidateUseCase from "../../use-cases/candidateUseCase";
 import { Request, Response, NextFunction, response } from "express";
@@ -194,7 +195,6 @@ class CandidateController {
       }
 
       const interviewList = await this.candidateCase.getScheduledInterviewList(candidateId)
-      // console.log("controller: ", interviewList)
       return res.status(200).json({success: true, data: interviewList})
 
     } catch (error) {
@@ -204,7 +204,6 @@ class CandidateController {
 
   async handleForgotPassword(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log("inside contoroller")
       const {email} = req.body
       console.log(email)
       const token = await this.candidateCase.initiatePasswordReset(email)
@@ -226,6 +225,21 @@ class CandidateController {
       await this.candidateCase.resetPassword(otp, password, token)
       return res.status(201).json({success: true, message: "Password changed successfully"})
       
+    } catch (error) {
+      next(error)
+    }
+  }
+
+
+  async getFeedbackDetails(req: Request, res: Response, next: NextFunction) {
+    try {
+      const {interviewId} = req.query 
+
+      if(!interviewId || typeof interviewId !== 'string') throw new AppError("invalid interview Id", 400)
+
+      // const id = new mongoose.Types.ObjectId(interviewId)
+      const feedback = await this.candidateCase.getFeedbackDetails(interviewId)
+      return res.status(200).json({success: true, data: feedback})
     } catch (error) {
       next(error)
     }

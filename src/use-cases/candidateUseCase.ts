@@ -185,6 +185,15 @@ class CandidateUseCase {
     return 
 
   }
+
+
+  async getFeedbackDetails(interviewId: string) {
+    const  feedback =await this.iCandidateRepository.getFeedbackDetails(interviewId)
+    if(!feedback) throw new AppError("Feedback details not found", 400)
+    const interviewDetails = await this.iCandidateRepository.scehduledInterviewDetails(feedback?.interviewId)
+
+    return {feedback, interviewDetails}
+  }
 }
 
 

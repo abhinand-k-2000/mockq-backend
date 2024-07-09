@@ -6,9 +6,7 @@ import { ScheduledInterviewModel } from "../database/scheduledInterviewModel";
 class PaymentRepository implements IPaymentRepository {
 
     async bookSlot(info: any): Promise<void | null> {
-        // const { interviewerId, _id, date, candidateId } = info;
-        const { interviewerId, to, from, _id, date, candidateId, price, title, description } = info
-        console.log("Info: ", info)
+        const { interviewerId, to, from, _id, date, candidateId, price, title, description, roomId } = info
     
         try {
           const updatedSlot = await InterviewSlotModel.findOneAndUpdate(
@@ -34,7 +32,6 @@ class PaymentRepository implements IPaymentRepository {
             return null;
           }
     
-          console.log("Slot updated successfully: ", updatedSlot);
 
           const scheduledInterview = new ScheduledInterviewModel({
             interviewerId,
@@ -44,11 +41,11 @@ class PaymentRepository implements IPaymentRepository {
             toTime: to,
             price,
             title,
-            description
+            description,
+            roomId
         });
 
         const savedScheduledInterview = await scheduledInterview.save()
-        console.log("Scheduled interview created: ", savedScheduledInterview);
 
 
           return;

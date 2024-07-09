@@ -1,4 +1,5 @@
 interface ScheduledInterview {
+    _id: string;
     date: Date;
     fromTime: Date;
     toTime: Date;
@@ -7,8 +8,9 @@ interface ScheduledInterview {
     price: number;
     interviewerId: string;
     candidateId: string
-    status: string
-}
+    status: string;
+    roomId: string;
+}     
 
 
 

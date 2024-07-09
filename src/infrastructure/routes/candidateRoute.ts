@@ -9,6 +9,7 @@ import JwtToken from "../utils/JwtToken"
 import MailService from "../utils/mailService"
 import HashPassword from "../utils/hashPassword"
 import candidateAuthenticate from "../middlewares/candidateAuth"
+import { emitWarning } from "process"
 
 const repository = new CandidateRepository()
 const otp = new OtpGenerate()
@@ -38,5 +39,7 @@ router.get('/get-scheduled-interviews', candidateAuthenticate, (req, res, next) 
 router.post('/forgot-password', (req, res, next) => controller.handleForgotPassword(req, res, next))
 
 router.post('/reset-password', (req, res, next) => controller.resetPassword(req, res, next))
+
+router.get('/get-feedback-details', candidateAuthenticate, (req, res, next) => controller.getFeedbackDetails(req, res, next))
 
 export default router   
