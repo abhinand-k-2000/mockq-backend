@@ -106,6 +106,10 @@ class CandidateRepository implements ICandidateRepository {
       profilePicture: 1,
       yearsOfExperience: 1,
     });
+
+
+    // Slots which are in the past are not fetched 
+
     const interviewSlotDetails = await InterviewSlotModel.aggregate([
       {
         $match: { interviewerId: interviewerId },
@@ -125,9 +129,29 @@ class CandidateRepository implements ICandidateRepository {
             },
             { "slots.schedule.technologies": { $in: [techName] } },
           ],
+          // "slots.date": {$gte: new Date()},
+          
+        },   
+      },
+      {
+        $match: {
+          $or: [
+            { "slots.date": { $gt: new Date() } }, // Future dates
+            {
+              $and: [
+                { "slots.date": { $eq: new Date().toISOString().split("T")[0] } }, // Today's date
+                { "slots.schedule.timeTo": { $gte: new Date() } }, // Times that are not in the past
+              ],
+            },
+          ],
         },
       },
+      {
+        $sort: {"slots.date": 1}
+      }
     ]);
+
+
 
     const details = {
       interviewerDetails,

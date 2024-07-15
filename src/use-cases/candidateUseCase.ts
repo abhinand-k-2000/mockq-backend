@@ -34,6 +34,7 @@ class CandidateUseCase {
         message: "Candidate found",
       };
     } else {
+      console.log(candidateInfo.email)
       const otp: string = this.otpGenerate.generateOtp();
       console.log("OTP: ", otp);
       const token = this.jwtToken.otpToken(candidateInfo, otp);
@@ -193,6 +194,15 @@ class CandidateUseCase {
     const interviewDetails = await this.iCandidateRepository.scehduledInterviewDetails(feedback?.interviewId)
 
     return {feedback, interviewDetails}
+  }
+
+  async isCandidatePremium(candidateId: string) {
+    const candidate = await this.iCandidateRepository.findCandidateById(candidateId);
+    if(candidate?.isPremium){
+      return true
+    }else {
+      return false
+    }
   }
 }
 

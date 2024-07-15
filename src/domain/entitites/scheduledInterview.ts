@@ -10,6 +10,7 @@ interface ScheduledInterview {
     candidateId: string
     status: string;
     roomId: string;
+    // feedabackAdded: boolean
 }     
 
 

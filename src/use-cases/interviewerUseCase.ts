@@ -266,6 +266,13 @@ class InterviewerUseCase {
     await this.iInterviewerRepository.saveFeedback(feedbacKDetails)
   }
 
+  
+  async getPaymentDashboard(interviewerId: string) {
+
+    const details = await this.iInterviewerRepository.getPaymentDashboard(interviewerId)
+    return details
+  }
+
 
 
 

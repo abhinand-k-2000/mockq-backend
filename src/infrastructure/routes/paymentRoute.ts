@@ -17,6 +17,8 @@ router.post('/create-payment', candidateAuthenticate, (req, res, next) => contro
 
 router.post('/webhook', express.raw({type: 'application/json'}), (req, res, next ) => controller.handleWebhook(req, res, next))
 
+router.post('/create-subscription', (req, res, next) => controller.createSubscription(req, res, next))
+
 
 
 

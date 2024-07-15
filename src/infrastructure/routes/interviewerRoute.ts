@@ -49,7 +49,7 @@ router.get('/get-slots', authenticate, (req, res, next) => controller.getIntervi
 router.get('/get-domains', authenticate, (req, res, next) => controller.getDomains(req, res, next))
 
 router.post('/forgot-password', (req, res, next) => controller.handleForgotPassword(req, res, next))
-
+       
 
 router.post('/reset-password', (req, res, next) => controller.resetPassword(req, res, next))
 
@@ -60,6 +60,8 @@ router.get('/get-details', authenticate, (req, res, next) => controller.getDetai
 router.get('/get-scheduled-interview-by-id', authenticate, (req, res, next) => controller.getScheduledInterviewById(req, res, next))
 
 router.post('/give-feedback', authenticate, (req, res,next) => controller.saveFeedbackDetails(req, res, next))
+
+router.get('/get-payment-dashboard', authenticate, (req, res, next) => controller.getPaymentDashboard(req, res, next))
 
 
 

@@ -1,6 +1,7 @@
 import Admin from '../../domain/entitites/admin'
 import Candidate from '../../domain/entitites/candidate'
 import { InterviewerRegistration } from '../../domain/entitites/interviewer'
+import ScheduledInterview from '../../domain/entitites/scheduledInterview'
 import Stack from '../../domain/entitites/stack'
 
 
@@ -17,6 +18,10 @@ interface IAdminRepository {
     getInterviewerDetails(id: string): Promise<InterviewerRegistration | null>
     approveInterviewer(id: string): Promise<boolean>
     unlistStack(id: string): Promise<Stack | null>
+
+    findAllInterviews(): Promise<ScheduledInterview[]| null>
+
+    dashboardDetails() : Promise<any>
 
 }
 

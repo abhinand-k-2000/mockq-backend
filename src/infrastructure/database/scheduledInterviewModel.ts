@@ -42,7 +42,11 @@ const ScheduledInterviewSchema = new Schema<ScheduledInterview>({
   roomId: {
     type: String,
     required: true
-  }
+  },
+  // feedabackAdded: {
+  //   type: Boolean,
+  //   default: false
+  // }
 }, {timestamps: true});
 
 const ScheduledInterviewModel = mongoose.model<ScheduledInterview>(

@@ -34,5 +34,7 @@ router.get('/interviewer/:id',adminAuthenticate, (req, res, next) => controller.
 
 router.put('/approve-interviewer/:id',adminAuthenticate, (req, res, next) => controller.approveInterviewer(req, res, next))
 
+router.get('/interviews-list', adminAuthenticate, (req, res, next) => controller.getAllInterviews(req, res, next))
+
 
 export default router

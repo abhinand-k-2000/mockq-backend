@@ -23,6 +23,8 @@ interface IInterviewerRepository {
 
     saveFeedback(feedbackDetails: Feedback): Promise<void >
 
+    getPaymentDashboard(interviewerId: string): Promise<any>
+
 }
 
 export default IInterviewerRepository

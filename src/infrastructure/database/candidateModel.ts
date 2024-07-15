@@ -23,7 +23,19 @@ const candidateSchema: Schema<Candidate> = new Schema({
     isBlocked: {
         type: Boolean,
         default: false
+    },
+    isPremium: {
+        type: Boolean,
+        default: false
+    },
+    subscriptionType: {
+        type: String,
+        default: 'free'
+    },
+    subscriptionExpiry: {
+        type: Date
     }
+
 
 })
 

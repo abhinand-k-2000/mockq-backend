@@ -244,6 +244,20 @@ class CandidateController {
       next(error)
     }
   }
+
+  async handleCandidatePremium(req: Request, res: Response, next: NextFunction) {
+    try {
+      const candidateId = req.candidateId
+      if(!candidateId) throw new AppError("Candidate Id not found", 400)
+      const isPremium = await this.candidateCase.isCandidatePremium(candidateId)
+      if(isPremium){
+        return res.status(200).json({success: true, message: "Candidate is a premium candidate"})
+      }
+      throw new AppError("Candidate is not premium", 404)
+    } catch (error) {
+      next(error)
+    }
+  }
 }   
 
 

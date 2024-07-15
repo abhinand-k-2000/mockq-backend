@@ -182,6 +182,15 @@ class AdminController {
         next(error)
     }
   }
+
+  async getAllInterviews(req: Request, res: Response, next: NextFunction) {
+    try {
+      const interviews = await this.adminCase.getAllInterviews()
+      return res.status(200).json({success: true, data: interviews})
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 export default AdminController;

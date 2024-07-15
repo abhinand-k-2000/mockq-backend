@@ -91,8 +91,14 @@ class AdminUseCase {
   }
 
   async getAllStacks() {
-    const stacksList = this.iAdminRepository.findAllStacks();
+    const stacksList = await this.iAdminRepository.findAllStacks();
     return stacksList;
+  }
+
+
+  async getAllInterviews() {
+    const interviews = await this.iAdminRepository.findAllInterviews()
+    return interviews
   }
 }
 

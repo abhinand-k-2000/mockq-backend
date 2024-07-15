@@ -42,4 +42,6 @@ router.post('/reset-password', (req, res, next) => controller.resetPassword(req,
 
 router.get('/get-feedback-details', candidateAuthenticate, (req, res, next) => controller.getFeedbackDetails(req, res, next))
 
+router.get('/is-premium', candidateAuthenticate, (req, res, next) => controller.handleCandidatePremium(req, res, next))
+
 export default router   

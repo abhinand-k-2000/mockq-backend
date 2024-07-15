@@ -8,6 +8,8 @@ import Stack from "../../domain/entitites/stack";
 import { InterviewerRegistration } from "../../domain/entitites/interviewer";
 import { InterviewerModel } from "../database/interviewerModel";
 import AppError from "../utils/appError";
+import ScheduledInterview from "../../domain/entitites/scheduledInterview";
+import { ScheduledInterviewModel } from "../database/scheduledInterviewModel";
 
 class AdminRepository implements IAdminRepository {
   async findByEmail(email: string): Promise<Admin | null> {
@@ -105,6 +107,51 @@ class AdminRepository implements IAdminRepository {
       throw new AppError("Failed to fetch stacks from database", 500);
     }
     return stacksList;
+  }
+
+  async findAllInterviews(): Promise<ScheduledInterview[] | null> {
+    const interviews = await ScheduledInterviewModel.aggregate([
+      {
+        $lookup: {
+          from: "interviewers",
+          let: { interviewerId: { $toObjectId: "$interviewerId" } },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$_id", "$$interviewerId"] } } },
+          ],
+          as: "interviewer",
+        },
+      },
+      {
+        $unwind: "$interviewer"
+      },
+      {
+        $project: {
+          "interviewer.password": 0,
+          "interviewer.salarySlip": 0,
+          "interviewer.resume": 0,
+        },
+      },
+      {
+        $lookup: {
+          from: "candidates",
+          let: { candidateId: { $toObjectId: "$candidateId" } },
+          pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$candidateId"] } } }],
+          as: "candidate",
+        },
+      },
+      {
+        $unwind: "$candidate"
+      },
+      { $project: { "candidate.password": 0 } },
+
+    ]);
+
+    return interviews;
+  }
+
+
+  async dashboardDetails(): Promise<any> {
+    
   }
 }
 

@@ -1,6 +1,8 @@
 import IPaymentRepository from "../../interface/repositories/IPaymentRepository";
+import { CandidateModel } from "../database/candidateModel";
 import { InterviewSlotModel } from "../database/interviewSlotModel";
 import { ScheduledInterviewModel } from "../database/scheduledInterviewModel";
+import AppError from "../utils/appError";
 
 
 class PaymentRepository implements IPaymentRepository {
@@ -56,8 +58,28 @@ class PaymentRepository implements IPaymentRepository {
 
       }
 
+    async updateUserPremiumStatus(candidateId: string): Promise<void> {
+
+
+      console.log("inside the payment repository: ", candidateId)
+
+      const currentDate = new Date();
+
+      const oneYearFromNow = new Date(currentDate.getFullYear() + 1, currentDate.getMonth(), currentDate.getDate())
+
+      const updateUser = await CandidateModel.findByIdAndUpdate(candidateId, {
+        isPremium: true, 
+        subscriptionType: 'premium',
+        subscriptionExpiry: oneYearFromNow
+      })
+
+      if(!updateUser) throw new AppError("User not found or failed to update", 500)
+    }
+
     
 }
+
+31
 
 
 export default PaymentRepository

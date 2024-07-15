@@ -14,6 +14,8 @@ import { ScheduledInterviewModel } from "../database/scheduledInterviewModel";
 import { StackModel } from "../database/stackModel";
 import AppError from "../utils/appError";
 
+
+
 class InterviewerRepository implements IInterviewerRepository {
   async findByEmail(email: string): Promise<InterviewerRegistration | null> {
     const interviewerFound = await InterviewerModel.findOne({ email: email });
@@ -149,6 +151,9 @@ class InterviewerRepository implements IInterviewerRepository {
           schedule: "$slots.schedule",
         },
       },
+      {
+        $sort: { date: -1 },
+      },
     ]);
 
     return slotsList;
@@ -164,7 +169,7 @@ class InterviewerRepository implements IInterviewerRepository {
     interivewerId: string,
     password: string
   ): Promise<void | null> {
-     await InterviewerModel.findByIdAndUpdate(interivewerId, {
+    await InterviewerModel.findByIdAndUpdate(interivewerId, {
       password: password,
     });
   }
@@ -174,7 +179,8 @@ class InterviewerRepository implements IInterviewerRepository {
   ): Promise<ScheduledInterview[]> {
     const list = await ScheduledInterviewModel.find({
       interviewerId: interviewerId,
-    });
+    }).sort({ date: -1 });
+
     if (!list) throw new AppError("Interviews are not scheduled", 404);
     return list;
   }
@@ -182,18 +188,6 @@ class InterviewerRepository implements IInterviewerRepository {
   async getScheduledInterviewById(
     interviewId: object
   ): Promise<ScheduledInterview[] | null> {
-    // const interview = await ScheduledInterviewModel.aggregate([
-    //   {
-    //     $match: {_id: interviewId}
-    //   }, {
-    //     $lookup: {
-    //       from: "interviewers",
-    //       localField: "interviewerId",
-    //       foreignField: "_id",
-    //       as: 'interviewer'
-    //     }
-    //   }
-    // ])
     const interview = await ScheduledInterviewModel.aggregate([
       {
         $match: { _id: interviewId }, // Use interviewId directly as a string
@@ -229,7 +223,7 @@ class InterviewerRepository implements IInterviewerRepository {
     return interview[0];
   }
 
-  async saveFeedback(feedbackDetails: Feedback): Promise<void > {
+  async saveFeedback(feedbackDetails: Feedback): Promise<void> {
     const {
       interviewId,
       interviewerId,
@@ -237,10 +231,10 @@ class InterviewerRepository implements IInterviewerRepository {
       technicalSkills,
       communicationSkills,
       problemSolvingSkills,
-      strength,    
+      strength,
       areaOfImprovement,
-      additionalComments,     
-    } = feedbackDetails;     
+      additionalComments,
+    } = feedbackDetails;
 
     const feedback = new FeedBackModel({
       interviewId,
@@ -254,16 +248,60 @@ class InterviewerRepository implements IInterviewerRepository {
       additionalComments,
     });
 
-    await feedback.save()
+    await feedback.save();
 
-    const statusUpated = await ScheduledInterviewModel.findByIdAndUpdate(interviewId, {
-      status: "Completed"
-    })
-
-    
-
-
+    const statusUpated = await ScheduledInterviewModel.findByIdAndUpdate(
+      interviewId,
+      {
+        status: "Completed",
+      }
+    );
   }
+
+  async getPaymentDashboard(interviewerId: string): Promise<any> {
+
+    // const interviews = await ScheduledInterviewModel.find({interviewerId: interviewerId})
+      
+    const interviews = await ScheduledInterviewModel.aggregate([
+      {
+        $match: {interviewerId: interviewerId.toString()}
+      },
+      {
+        $lookup: {
+          from: "candidates",
+          let: {candidateId: {$toObjectId: "$candidateId"}},
+          pipeline: [
+            {
+              $match: {
+                $expr: {$eq: ["$_id", "$$candidateId"]}
+              }
+            }
+          ],
+          as: "candidate"
+        }
+      },
+      {$unwind: "$candidate"},
+      {
+        $project: {"candidate.password": 0, "candidate.email": 0, "candidate.mobile": 0}
+      }
+    ])
+
+    const totalEarnings = await ScheduledInterviewModel.aggregate([
+      {
+        $match: {interviewerId: interviewerId.toString()}
+      },
+      {
+        $group: {'_id': null, total: {$sum: "$price"}}
+      }
+    ])
+
+    const totalRevenue = totalEarnings[0].total
+    return {interviews, totalRevenue}
+  }
+
+
+
+
 }
 
 export default InterviewerRepository;

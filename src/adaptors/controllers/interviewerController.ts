@@ -390,6 +390,19 @@ class InterviewerController {
       next(error)
     }
   }
+
+
+  async getPaymentDashboard(req: Request, res: Response, next: NextFunction) {
+    try {
+      const interviewerId = req.interviewerId;
+      if(!interviewerId) throw new AppError("Interviewer Id not found", 400)
+
+      const data = await this.interviewerCase.getPaymentDashboard(interviewerId)
+      return res.status(200).json({success: true, data})
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 export default InterviewerController;
