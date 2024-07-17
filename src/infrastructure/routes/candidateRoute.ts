@@ -44,4 +44,6 @@ router.get('/get-feedback-details', candidateAuthenticate, (req, res, next) => c
 
 router.get('/is-premium', candidateAuthenticate, (req, res, next) => controller.handleCandidatePremium(req, res, next))
 
+router.get('/get-all-premium-users', candidateAuthenticate, (req, res, next) => controller.getAllPremiumCandidates(req, res, next))
+
 export default router   

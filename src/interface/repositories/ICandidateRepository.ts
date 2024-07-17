@@ -29,6 +29,8 @@ interface ICandidateRepository {
     getFeedbackDetails(interviewId: string): Promise<Feedback | null>
 
     scehduledInterviewDetails(interviewId: string): Promise<ScheduledInterview | null>
+
+    getAllPremiumCandidates(search: string, candidateId: string): Promise<Candidate[]>
 }
 
 export default ICandidateRepository  

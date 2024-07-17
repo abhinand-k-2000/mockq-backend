@@ -10,17 +10,17 @@ const chatSchema: Schema<Chat> = new Schema({
     },
     users: [
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: "Candidate"
         }
     ],
     latestMessage: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Message"
     },
     groupAdmin: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+        type: Schema.Types.ObjectId,
+        ref: "Candidate"
 
     }
 }, {
@@ -29,6 +29,6 @@ const chatSchema: Schema<Chat> = new Schema({
 
 
 
-const Chat: Model<Chat> = mongoose.model('Chat', chatSchema);
+const ChatModel: Model<Chat> = mongoose.model('Chat', chatSchema);
 
-export {Chat}
+export {ChatModel}

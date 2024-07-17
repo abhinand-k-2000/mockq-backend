@@ -6,8 +6,8 @@ interface Chat {
     users: mongoose.Schema.Types.ObjectId[];
     latestMessage: mongoose.Schema.Types.ObjectId;
     groupAdmin: mongoose.Schema.Types.ObjectId;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export default Chat

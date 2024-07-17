@@ -204,6 +204,12 @@ class CandidateUseCase {
       return false
     }
   }
+
+
+  async getAllPremiumUsers(search: string, candidateId: string) {
+    const candidates = await this.iCandidateRepository.getAllPremiumCandidates(search, candidateId)
+    return candidates
+  }
 }
 
 

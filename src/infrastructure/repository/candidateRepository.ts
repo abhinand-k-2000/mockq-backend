@@ -246,6 +246,25 @@ class CandidateRepository implements ICandidateRepository {
       const interviewDetails = await ScheduledInterviewModel.findById(interviewId)
       return interviewDetails
   }
+
+
+
+  async getAllPremiumCandidates(search: string, candidateId: string): Promise<Candidate[]> {
+
+    const candidates = await CandidateModel.find(
+      {
+        $and: [
+
+          {$or: [
+            {name: {$regex: search, $options: 'i'}},
+            {email: {$regex: search, $options: 'i'}}, 
+          ]},
+          {isPremium: true}
+        ]
+      }
+    ).find({_id: {$ne: candidateId}});
+    return candidates
+  }
 }
 
 export default CandidateRepository;

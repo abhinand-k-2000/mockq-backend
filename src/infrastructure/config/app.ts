@@ -4,9 +4,11 @@ import adminRoute from "../routes/adminRoute";
 import candidateRoute from "../routes/candidateRoute";
 import interviewerRoute from "../routes/interviewerRoute";
 import paymentRoute from "../routes/paymentRoute";
+import chatRoute from "../routes/chatRoute"
 import http from "http";
 import cookieParser from "cookie-parser";
 import errorMiddleware from "../middlewares/errorMiddleware";
+import socketServer from "./socketServer";
 
 const createServer = () => {
   try {
@@ -35,9 +37,12 @@ const createServer = () => {
     app.use("/api/candidate", candidateRoute);
     app.use("/api/interviewer", interviewerRoute);
     app.use("/api/payment", paymentRoute);
+    app.use('/api/chat', chatRoute)
 
     app.use(errorMiddleware);
     const server = http.createServer(app);
+
+    socketServer(server)
     return server;
   } catch (error) {
     console.log(error);

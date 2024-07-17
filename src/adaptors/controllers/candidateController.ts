@@ -258,7 +258,23 @@ class CandidateController {
       next(error)
     }
   }
-}   
 
+
+  async getAllPremiumCandidates(req: Request, res: Response, next: NextFunction) {
+    try {
+      const {search} = req.query
+      const candidateId = req.candidateId?.toString()
+      if(!candidateId) throw new AppError("candidate id not found", 400)
+      console.log("queryu: ", search)
+      if(!search || typeof search !== 'string') throw new AppError("search query not found", 400)
+      const candidates = await this.candidateCase.getAllPremiumUsers(search, candidateId)
+      
+      return res.status(200).json({success: true, data: candidates})
+    } catch (error) {
+      next(error)
+    }
+  }
+}   
+ 
 
 export default CandidateController
