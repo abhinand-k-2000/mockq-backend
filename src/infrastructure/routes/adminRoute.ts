@@ -36,5 +36,6 @@ router.put('/approve-interviewer/:id',adminAuthenticate, (req, res, next) => con
 
 router.get('/interviews-list', adminAuthenticate, (req, res, next) => controller.getAllInterviews(req, res, next))
 
+router.get('/dashboard', adminAuthenticate, (req, res, next) => controller.getDashboardDetails(req, res, next))
 
 export default router

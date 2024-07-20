@@ -43,10 +43,10 @@ const ScheduledInterviewSchema = new Schema<ScheduledInterview>({
     type: String,
     required: true
   },
-  // feedabackAdded: {
-  //   type: Boolean,
-  //   default: false
-  // }
+  interviewerRatingAdded: {
+    type: Boolean,
+    default: false
+  }
 }, {timestamps: true});
 
 const ScheduledInterviewModel = mongoose.model<ScheduledInterview>(

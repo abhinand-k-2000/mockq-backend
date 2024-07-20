@@ -46,4 +46,8 @@ router.get('/is-premium', candidateAuthenticate, (req, res, next) => controller.
 
 router.get('/get-all-premium-users', candidateAuthenticate, (req, res, next) => controller.getAllPremiumCandidates(req, res, next))
 
+router.post('/give-interviewer-rating', candidateAuthenticate, (req, res, next) => controller.saveInterviewerRating(req, res, next))
+
+router.get('/get-analytics', candidateAuthenticate, (req, res, next) => controller.getCandidateAnalytics(req, res, next))
+
 export default router   

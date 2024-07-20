@@ -100,6 +100,11 @@ class AdminUseCase {
     const interviews = await this.iAdminRepository.findAllInterviews()
     return interviews
   }
+
+  async getDashboardDetails() {
+    const details = await this.iAdminRepository.dashboardDetails()
+    return details
+  }
 }
 
 export default AdminUseCase;

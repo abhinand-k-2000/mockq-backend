@@ -6,6 +6,7 @@ import IGenerateOtp from "../interface/utils/IGenerateOtp";
 import IJwtToken from "../interface/utils/IJwtToken";
 import IMailService from "../interface/utils/IMailService";
 import IHashPassword from "../interface/utils/IhashPassword";
+import InterviewerRating from "../domain/entitites/interviewerRating";
 
 type DecodedToken = {
   info: { userId: string };
@@ -209,6 +210,15 @@ class CandidateUseCase {
   async getAllPremiumUsers(search: string, candidateId: string) {
     const candidates = await this.iCandidateRepository.getAllPremiumCandidates(search, candidateId)
     return candidates
+  }
+
+  async saveInterviewerRating(data: InterviewerRating) {
+    const newRating = await this.iCandidateRepository.saveInterviewerRating(data)
+  }
+
+  async getCandidateAnalytics(candidateId: string) {
+    const analytics = await this.iCandidateRepository.getCandidateAnalytics(candidateId)
+    return analytics
   }
 }
 

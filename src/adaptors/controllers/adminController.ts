@@ -191,6 +191,15 @@ class AdminController {
       next(error)
     }
   }
+
+  async getDashboardDetails(req: Request, res: Response, next: NextFunction) {
+    try {
+      const details = await this.adminCase.getDashboardDetails()
+      return res.status(200).json({success: true, data: details})
+    } catch (error) {
+      next(error)
+    }
+  }
 }
 
 export default AdminController;

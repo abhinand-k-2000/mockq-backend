@@ -16,7 +16,7 @@ const amdinAuth = async (req: Request, res: Response, next: NextFunction) => {
   if (!token) {
     return res
       .status(401)
-      .json({ success: false, message: "Unacuthorized, No token provided" });
+      .json({ success: false, message: "Unauthorized, No token provided" });
   }
 
   try {

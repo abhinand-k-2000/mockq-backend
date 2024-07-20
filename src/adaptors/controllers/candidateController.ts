@@ -274,6 +274,36 @@ class CandidateController {
       next(error)
     }
   }
+
+  async saveInterviewerRating(req: Request, res: Response, next: NextFunction) {
+    try {
+      const {interviewerId, interviewId, rating, comment} = req.body
+      const candidateId = req.candidateId;
+
+      if(!candidateId) throw new AppError("candidate id not found", 400)
+
+      const data = {
+        interviewerId, candidateId, interviewId, rating, comment
+      }
+
+      await this.candidateCase.saveInterviewerRating(data)
+      return res.status(201).json({success: true, message: "Rating done successfully"})
+    } catch (error) {
+      next(error)
+    }   
+  }
+
+  async getCandidateAnalytics(req: Request, res: Response, next: NextFunction) {
+    try {
+      const candidateId = req.candidateId
+      if(!candidateId) throw new AppError("candidate id not found", 400)
+      
+      const analytics = await this.candidateCase.getCandidateAnalytics(candidateId.toString());
+      return res.status(200).json({success: true, data: analytics})
+    } catch (error) {
+      next(error)
+    }
+  }
 }   
  
 

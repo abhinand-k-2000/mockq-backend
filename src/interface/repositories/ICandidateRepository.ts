@@ -1,6 +1,7 @@
 import Candidate from "../../domain/entitites/candidate"
 import Feedback from "../../domain/entitites/feedBack";
 import { InterviewerRegistration } from "../../domain/entitites/interviewer"
+import InterviewerRating from "../../domain/entitites/interviewerRating";
 import ScheduledInterview from "../../domain/entitites/scheduledInterview";
 import Stack from "../../domain/entitites/stack"
 
@@ -31,6 +32,10 @@ interface ICandidateRepository {
     scehduledInterviewDetails(interviewId: string): Promise<ScheduledInterview | null>
 
     getAllPremiumCandidates(search: string, candidateId: string): Promise<Candidate[]>
+
+    saveInterviewerRating(rating: InterviewerRating): Promise<void>
+
+    getCandidateAnalytics(candidateId: string): Promise<any>
 }
 
 export default ICandidateRepository  

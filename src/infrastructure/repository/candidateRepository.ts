@@ -1,6 +1,7 @@
 import Candidate from "../../domain/entitites/candidate";
 import Feedback from "../../domain/entitites/feedBack";
 import { InterviewerRegistration } from "../../domain/entitites/interviewer";
+import InterviewerRating from "../../domain/entitites/interviewerRating";
 import ScheduledInterview from "../../domain/entitites/scheduledInterview";
 import Stack from "../../domain/entitites/stack";
 import ICandidateRepository, {
@@ -10,6 +11,7 @@ import { CandidateModel } from "../database/candidateModel";
 import { FeedBackModel } from "../database/feedBackModel";
 import { InterviewSlotModel } from "../database/interviewSlotModel";
 import { InterviewerModel } from "../database/interviewerModel";
+import { InterviewerRatingModel } from "../database/interviewerRatingModel";
 import { ScheduledInterviewModel } from "../database/scheduledInterviewModel";
 import { StackModel } from "../database/stackModel";
 import AppError from "../utils/appError";
@@ -264,6 +266,47 @@ class CandidateRepository implements ICandidateRepository {
       }
     ).find({_id: {$ne: candidateId}});
     return candidates
+  }
+
+  async saveInterviewerRating(data: InterviewerRating): Promise<void> {
+    const {interviewerId, candidateId, interviewId, rating, comment} = data;
+
+    const newRating =  new InterviewerRatingModel({
+      interviewerId, candidateId, interviewId, rating, comment
+    })
+
+   await newRating.save()
+
+   await ScheduledInterviewModel.findByIdAndUpdate(interviewId, {interviewerRatingAdded: true})
+
+  }
+
+
+  async getCandidateAnalytics(candidateId: string): Promise<any> {
+
+    console.log(candidateId)
+    
+    const interviews = await ScheduledInterviewModel.aggregate([
+      {
+        $match: {candidateId: candidateId}
+      },
+       {
+        $group: {_id: '$status', totalNumber: {$sum: 1}}
+      }
+    ])
+
+    const interviewCounts = {completed: 0, scheduled: 0}
+
+    interviews.forEach((item) => {
+      if(item._id === 'Completed'){
+        interviewCounts.completed = item.totalNumber
+      }else if(item._id === 'Scheduled') {
+        interviewCounts.scheduled = item.totalNumber
+      }
+    })
+
+
+    return interviewCounts
   }
 }
 

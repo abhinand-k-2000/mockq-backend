@@ -151,7 +151,28 @@ class AdminRepository implements IAdminRepository {
 
 
   async dashboardDetails(): Promise<any> {
-    
+    const interviewersCount = await InterviewerModel.find().countDocuments()
+    const candidatesCount = await CandidateModel.find().countDocuments()
+    const interviews = await ScheduledInterviewModel.aggregate([
+      {
+        $group: {_id: '$status', total: {$sum: 1}}
+      }
+    ])
+    const interviewsCount = {completed: 0, scheduled: 0}
+
+    interviews.forEach((int) => {
+      if(int._id === 'Completed'){
+        interviewsCount.completed = int.total
+      }else if(int._id === 'Scheduled') {
+        interviewsCount.scheduled = int.total
+      }
+    })
+
+    const scheduledInterviews = await ScheduledInterviewModel.find()   
+
+
+    return {interviewersCount, candidatesCount, interviewsCount, scheduledInterviews}
+
   }
 }
 
