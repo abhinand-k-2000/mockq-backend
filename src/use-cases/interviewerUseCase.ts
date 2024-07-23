@@ -197,13 +197,13 @@ class InterviewerUseCase {
   }
 
 
-  async getInterviewSlots(interviewerId: string) {
-    const slotList = this.iInterviewerRepository.getInterviewSlots(interviewerId)
-    return slotList
+  async getInterviewSlots(interviewerId: string, page: number, limit: number) {
+    const {slots, total} = await this.iInterviewerRepository.getInterviewSlots(interviewerId, page, limit)
+    return {slots, total}
   }
 
   async getDomains() {
-    const domainList = this.iInterviewerRepository.getDomains();
+    const domainList = await this.iInterviewerRepository.getDomains();
     return domainList;
   }
 
@@ -245,10 +245,10 @@ class InterviewerUseCase {
 
   }
 
-  async getScheduledInterviews(interviewerId: string) {
+  async getScheduledInterviews(interviewerId: string, page: number, limit: number) {
 
-      const list: ScheduledInterview[] = await this.iInterviewerRepository.getScheduledInterviews(interviewerId)
-      return list
+      const {interviews, total} = await this.iInterviewerRepository.getScheduledInterviews(interviewerId, page, limit)
+      return {interviews, total}
   }
 
   async getDetails(interviewerId: string) {

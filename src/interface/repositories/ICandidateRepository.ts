@@ -23,7 +23,7 @@ interface ICandidateRepository {
     getInterviewerSlotsDetails(interviewerId: string, techName: string): Promise<any>
 
     // bookSlot(info: any): Promise<void | null>
-    getScheduledInterviews(candidateId: string): Promise< ScheduledInterview[] | null >
+    getScheduledInterviews(candidateId: string, page: number, limit: number): Promise< {interviews: ScheduledInterview[] | null, total: number}>
 
     updatePassword(candidateId: string, password: string): Promise<void | null> 
 

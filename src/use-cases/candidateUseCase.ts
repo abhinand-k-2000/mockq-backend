@@ -138,11 +138,11 @@ class CandidateUseCase {
 
   // }
 
-  async getScheduledInterviewList(candidateId: string) {
+  async getScheduledInterviewList(candidateId: string, page: number, limit: number) {
     try {
-      const interviewList =
-        await this.iCandidateRepository.getScheduledInterviews(candidateId);
-      return interviewList;
+      const {interviews, total} =
+        await this.iCandidateRepository.getScheduledInterviews(candidateId, page, limit);
+      return {interviews, total};
     } catch (error) {
       throw new AppError("Failed to fetch scheduled interviews", 500);
     }

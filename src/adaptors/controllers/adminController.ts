@@ -56,12 +56,16 @@ class AdminController {
 
   async getAllCandidates(req: Request, res: Response, next: NextFunction) {
     try {
-      const candidatesList = await this.adminCase.getAllCandidates();
+      const page = req.query.page ? parseInt(req.query.page as string ) : 1;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 5
+
+      const {candidates, total} = await this.adminCase.getAllCandidates(page, limit);
       return res
         .status(200)
         .json({
           success: true,
-          data: candidatesList,
+          data: candidates,
+          total,
           message: "Candidates list fetched",
         });
     } catch (error) {
@@ -71,12 +75,15 @@ class AdminController {
 
   async getAllInterviewers(req: Request, res: Response, next: NextFunction) {
     try {
-      const interviewersList = await this.adminCase.getAllInterviewers();
+      const page = req.query.page ? parseInt(req.query.page as string) : 1
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 5
+      const {interviewers, total} = await this.adminCase.getAllInterviewers(page, limit);
       return res
         .status(200)
         .json({
           success: true,
-          data: interviewersList,
+          data: interviewers,
+          total,
           message: "Interviewers list fetched",
         });
     } catch (error) {
@@ -158,12 +165,15 @@ class AdminController {
 
   async getAllStacks(req: Request, res: Response, next: NextFunction) {
     try {
-      const stacksList = await this.adminCase.getAllStacks();
+      const page = req.query.page ? parseInt(req.query.page as string) : 1
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 5
+      const {stacks, total} = await this.adminCase.getAllStacks(page, limit);
       return res
         .status(200)
         .json({
           success: true,
-          data: stacksList,
+          data: stacks,
+          total,
           message: "Stacks list fetched",
         });
     } catch (error) {
@@ -185,8 +195,10 @@ class AdminController {
 
   async getAllInterviews(req: Request, res: Response, next: NextFunction) {
     try {
-      const interviews = await this.adminCase.getAllInterviews()
-      return res.status(200).json({success: true, data: interviews})
+      const page = req.query.page ? parseInt(req.query.page as string) : 1
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 5
+      const {interviews, total} = await this.adminCase.getAllInterviews(page, limit)
+      return res.status(200).json({success: true, data: interviews, total})
     } catch (error) {
       next(error)
     }

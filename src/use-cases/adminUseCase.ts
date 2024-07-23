@@ -44,14 +44,14 @@ class AdminUseCase {
     };
   }
 
-  async getAllCandidates() {
-    const candidateList = await this.iAdminRepository.findAllCandidates();
-    return candidateList;
+  async getAllCandidates(page: number, limit: number) {
+    const {candidates, total} = await this.iAdminRepository.findAllCandidates(page, limit);
+    return {candidates, total};
   }
 
-  async getAllInterviewers() {
-    const interviewersList = await this.iAdminRepository.findAllInterviewers();
-    return interviewersList;
+  async getAllInterviewers(page: number, limit: number) {
+    const {interviewers, total} = await this.iAdminRepository.findAllInterviewers(page, limit);
+    return {interviewers, total};
   }
 
   async interviewerDetails(id: string) {
@@ -90,15 +90,15 @@ class AdminUseCase {
     throw new AppError("Failed to add stack", 400);
   }
 
-  async getAllStacks() {
-    const stacksList = await this.iAdminRepository.findAllStacks();
-    return stacksList;
+  async getAllStacks(page: number, limit: number) {
+    const {stacks, total} = await this.iAdminRepository.findAllStacks(page, limit);
+    return {stacks, total};
   }
 
 
-  async getAllInterviews() {
-    const interviews = await this.iAdminRepository.findAllInterviews()
-    return interviews
+  async getAllInterviews(page: number, limit: number) {
+    const {interviews, total} = await this.iAdminRepository.findAllInterviews(page, limit)
+    return {interviews, total}
   }
 
   async getDashboardDetails() {

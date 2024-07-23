@@ -12,12 +12,12 @@ interface IInterviewerRepository {
     saveInterviewerDetails(interviewerDetails: InterviewerRegistration): Promise<InterviewerRegistration | null>
     findById(id: string): Promise<InterviewerRegistration | null>
     saveInterviewSlot(slotData: InterviewSlot): Promise<InterviewSlot | null>
-    getInterviewSlots(interviewerId: string): Promise<InterviewSlot[] | null>
+    getInterviewSlots(interviewerId: string, page: number, limit: number): Promise<{slots: InterviewSlot[] | null, total: number}>
     getDomains():Promise<Stack[] | null>
 
     updatePassword(interviewerId: string, password: string): Promise<void | null>
 
-    getScheduledInterviews(interviewerId: string): Promise<ScheduledInterview[] >
+    getScheduledInterviews(interviewerId: string, page: number, limit: number): Promise<{interviews: ScheduledInterview[], total: number} >
 
     getScheduledInterviewById(interviewId: object): Promise<ScheduledInterview[] | null>
 

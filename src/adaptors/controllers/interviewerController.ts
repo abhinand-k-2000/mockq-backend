@@ -274,18 +274,22 @@ class InterviewerController {
 
   async getInterviewSlots(req: Request, res: Response, next: NextFunction) {
     try {
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 5
       const interviewerId = req.interviewerId;
       if (!interviewerId) {
         throw new AppError("Unauthorized user", 401);
       }
-      const slotsList = await this.interviewerCase.getInterviewSlots(
-        interviewerId
+      const {slots, total} = await this.interviewerCase.getInterviewSlots(
+        interviewerId,
+        page, limit
       );
       return res
         .status(200)
         .json({
           success: true,
-          data: slotsList,
+          data: slots,
+          total,
           message: "Fetched interview slots list",
         });
     } catch (error) {
@@ -341,32 +345,30 @@ class InterviewerController {
 
   async getScheduledInterviews(
     req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
+    res: Response, 
+    next: NextFunction      
+  ) { 
     try {
       const interviewerId = req.interviewerId;
+      const page = req.query.page ? parseInt(req.query.page as string) : 1;
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 5
+
       if (!interviewerId) throw new AppError("Interviewer not found", 400);
-      const scheduledInterviews =
-        await this.interviewerCase.getScheduledInterviews(interviewerId);
-      return res.status(200).json({ success: true, data: scheduledInterviews });
+      const {interviews, total} =
+        await this.interviewerCase.getScheduledInterviews(interviewerId, page, limit);
+      return res.status(200).json({ success: true, data: interviews, total });
     } catch (error) {
-      next(error);
+      next(error); 
     }
   }
 
   async getDetails(req: Request, res: Response, next: NextFunction) {
-    const interviewerId = req.interviewerId;
+    const interviewerId = req.interviewerId; 
     if (!interviewerId) throw new AppError("Interviewer id not found", 400);
-    
     const details = await this.interviewerCase.getDetails(interviewerId);
-
     return res.status(200).json({ success: true, data: details });
   }
-
-
-
-
+ 
   async getScheduledInterviewById(req: Request, res: Response, next: NextFunction) {
     try {
       const {interviewId} = req.query
@@ -382,8 +384,6 @@ class InterviewerController {
   async saveFeedbackDetails(req: Request, res: Response, next: NextFunction) {
     try {
       const {fullDetails} = req.body
-      console.log(req.body)
-      console.log(fullDetails)
       const feedBack = await this.interviewerCase.saveFeedback(fullDetails);
       return res.status(201).json({success: true, message: "Feedback uploaded successfully"})
     } catch (error) {
@@ -407,7 +407,6 @@ class InterviewerController {
   async verifyVideoConference(req: Request, res: Response, next: NextFunction) {
     try {
       const {roomId, userId} = req.body
-      console.log('inside controller: ', roomId, userId)
       if(!roomId || !userId) throw new AppError("Room ID and User ID are required", 400)
 
       const isVerified  = await this.interviewerCase.verifyVideoConference(roomId, userId)

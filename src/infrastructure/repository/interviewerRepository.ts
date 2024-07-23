@@ -135,8 +135,10 @@ class InterviewerRepository implements IInterviewerRepository {
   }
 
   async getInterviewSlots(
-    interviewerId: string
-  ): Promise<InterviewSlot[] | null> {
+    interviewerId: string,
+    page: number, limit: number
+  ): Promise<{slots: InterviewSlot[] | null, total: number}> {
+
     const slotsList = await InterviewSlotModel.aggregate([
       {
         $match: { interviewerId: interviewerId.toString() },
@@ -154,9 +156,26 @@ class InterviewerRepository implements IInterviewerRepository {
       {
         $sort: { date: -1 },
       },
+      {
+        $skip: page - 1 
+      },
+      {
+        $limit: limit
+      }
+    ]);
+    const totalDocs = await InterviewSlotModel.aggregate([
+      {
+        $match: { interviewerId: interviewerId.toString() },
+      },
+      { 
+        $unwind: "$slots",
+      },
+      {
+        $count: "totalCount"
+      }
     ]);
 
-    return slotsList;
+    return {slots: slotsList, total: totalDocs[0].totalCount};
   }
 
   async getDomains(): Promise<Stack[] | null> {
@@ -175,14 +194,18 @@ class InterviewerRepository implements IInterviewerRepository {
   }
 
   async getScheduledInterviews(
-    interviewerId: string
-  ): Promise<ScheduledInterview[]> {
+    interviewerId: string,
+    page: number, limit: number
+  ): Promise<{interviews: ScheduledInterview[], total: number}> {
     const list = await ScheduledInterviewModel.find({
       interviewerId: interviewerId,
-    }).sort({ date: -1 });
+    }).skip((page - 1) * limit).limit(limit).sort({ date: -1 });
+
+    const total = await ScheduledInterviewModel.find({interviewerId}).countDocuments()
 
     if (!list) throw new AppError("Interviews are not scheduled", 404);
-    return list;
+
+    return {interviews: list, total};
   }
 
   async getScheduledInterviewById(

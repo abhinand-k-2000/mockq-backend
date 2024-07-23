@@ -10,16 +10,20 @@ interface IAdminRepository {
     
     findByEmail(email: string): Promise<Admin | null>
     create(admin: Admin): Promise<void>
-    findAllCandidates(): Promise<Candidate[]>
+    findAllCandidates(page: number, limit: number): Promise<{candidates: Candidate[], total: number}>
+
     blockCandidate(id: string): Promise<boolean>
     addStack(stackName: string, technologies: string[]): Promise<boolean>
-    findAllStacks(): Promise<Stack[]>
-    findAllInterviewers(): Promise<InterviewerRegistration[]>
+
+    findAllStacks(page: number, limit: number): Promise<{stacks: Stack[], total: number}>
+
+    findAllInterviewers(page: number, limit: number): Promise<{interviewers: InterviewerRegistration[], total: number}>
+
     getInterviewerDetails(id: string): Promise<InterviewerRegistration | null>
     approveInterviewer(id: string): Promise<boolean>
     unlistStack(id: string): Promise<Stack | null>
 
-    findAllInterviews(): Promise<ScheduledInterview[]| null>
+    findAllInterviews(page: number, limit: number): Promise<{interviews: ScheduledInterview[] | null, total: number}>
 
     dashboardDetails() : Promise<any>
 

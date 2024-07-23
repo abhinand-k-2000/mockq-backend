@@ -184,15 +184,17 @@ class CandidateRepository implements ICandidateRepository {
 
       return;
     } catch (error) {
-      console.error("Error updating slot: ", error);
-      throw new Error("Failed to book slot");
+      throw error
     }
   }
 
-  async getScheduledInterviews(candidateId: string): Promise<ScheduledInterview[] | null> {
+  async getScheduledInterviews(candidateId: string, page: number, limit: number): Promise<{interviews: ScheduledInterview[] | null , total: number}> {
     const interviewList = await ScheduledInterviewModel.find({candidateId: candidateId})
+    .skip((page - 1) * limit).limit(limit)
 
-    return interviewList 
+    const total = await ScheduledInterviewModel.countDocuments({candidateId})
+
+    return {interviews: interviewList, total} 
 
   }   
 
@@ -284,7 +286,6 @@ class CandidateRepository implements ICandidateRepository {
 
   async getCandidateAnalytics(candidateId: string): Promise<any> {
 
-    console.log(candidateId)
     
     const interviews = await ScheduledInterviewModel.aggregate([
       {

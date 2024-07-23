@@ -25,20 +25,22 @@ class AdminRepository implements IAdminRepository {
     await newAdmin.save();
   }
 
-  async findAllCandidates(): Promise<Candidate[]> {
-    const candidatesList = await CandidateModel.find();
+  async findAllCandidates(page: number, limit: number): Promise<{candidates: Candidate[], total: number}> {
+    const candidatesList = await CandidateModel.find().skip((page - 1) * limit).limit(limit)
+    const total = await CandidateModel.find().countDocuments()
     if (!candidatesList) {
       throw new AppError("Failed to fetch candidates from database", 500);
     }
-    return candidatesList;
+    return {candidates: candidatesList, total};
   }
 
-  async findAllInterviewers(): Promise<InterviewerRegistration[]> {
-    const interviewersList = await InterviewerModel.find();
+  async findAllInterviewers(page: number, limit: number): Promise<{interviewers: InterviewerRegistration[], total: number}> {
+    const interviewersList = await InterviewerModel.find().skip((page - 1) * limit).limit(limit);
+    const total = await InterviewerModel.find().countDocuments()
     if (!interviewersList) {
       throw new AppError("Failed to fetch interviewers from database", 500);
     }
-    return interviewersList;
+    return {interviewers: interviewersList, total};
   }
 
   async getInterviewerDetails(
@@ -92,24 +94,26 @@ class AdminRepository implements IAdminRepository {
   async addStack(stackName: string, technologies: string[]): Promise<boolean> {
     const newStack = new StackModel({
       stackName: stackName,
-      technologies: technologies,
+      technologies: technologies, 
     });
     const savedStack = await newStack.save();
     if (!savedStack) {
       throw new AppError("Failed to add stack in the database", 500);
-    }
+    } 
     return true;
   }
 
-  async findAllStacks(): Promise<Stack[]> {
-    const stacksList = await StackModel.find();
+  async findAllStacks(page: number, limit: number): Promise<{stacks: Stack[], total: number}> {
+    const stacksList = await StackModel.find().skip((page - 1) * limit).limit(limit)
+    const total = await StackModel.find().countDocuments()
     if (!stacksList) {
       throw new AppError("Failed to fetch stacks from database", 500);
     }
-    return stacksList;
+    return {stacks: stacksList, total};
   }
 
-  async findAllInterviews(): Promise<ScheduledInterview[] | null> {
+  async findAllInterviews(page: number, limit: number): Promise<{interviews: ScheduledInterview[] | null, total: number}> {
+    
     const interviews = await ScheduledInterviewModel.aggregate([
       {
         $lookup: {
@@ -143,10 +147,14 @@ class AdminRepository implements IAdminRepository {
         $unwind: "$candidate"
       },
       { $project: { "candidate.password": 0 } },
+      {
+        $skip: (page - 1) * limit
+      }, {$limit: limit}
 
-    ]);
-
-    return interviews;
+    ]); 
+    
+    const total = await ScheduledInterviewModel.find().countDocuments()
+    return {interviews, total};
   }
 
 
