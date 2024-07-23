@@ -50,4 +50,7 @@ router.post('/give-interviewer-rating', candidateAuthenticate, (req, res, next) 
 
 router.get('/get-analytics', candidateAuthenticate, (req, res, next) => controller.getCandidateAnalytics(req, res, next))
 
+router.post('/verify-video-conference', candidateAuthenticate, (req, res, next) => controller.verifyVideoConference(req, res, next))
+
+
 export default router   

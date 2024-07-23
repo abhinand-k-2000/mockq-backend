@@ -36,6 +36,8 @@ interface ICandidateRepository {
     saveInterviewerRating(rating: InterviewerRating): Promise<void>
 
     getCandidateAnalytics(candidateId: string): Promise<any>
+
+    getScheduledInterviewByRoomId(roomId: string): Promise<ScheduledInterview | null>
 }
 
 export default ICandidateRepository  

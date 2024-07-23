@@ -63,6 +63,7 @@ router.post('/give-feedback', authenticate, (req, res,next) => controller.saveFe
 
 router.get('/get-payment-dashboard', authenticate, (req, res, next) => controller.getPaymentDashboard(req, res, next))
 
+router.post('/verify-video-conference', authenticate, (req, res, next) => controller.verifyVideoConference(req, res, next))
 
 
 

@@ -23,7 +23,7 @@ declare global {
 const interviewerAuth = async (req: RequestModified, res: Response, next: NextFunction) => {
 
     let token = req.cookies.interviewerToken
-
+    
     if(!token){
         return res.status(401).json({success: false, message: "Unauthorized, No token provided"})
     }
@@ -31,6 +31,7 @@ const interviewerAuth = async (req: RequestModified, res: Response, next: NextFu
     try {
         const decodedToken = jwt.verifyJwtToken(token)
         if(decodedToken && decodedToken.role !== "interviewer"){
+
             return res.status(401).send({success: false, message: "Unauthorized - Invalid Token"})
         }
 
@@ -42,6 +43,7 @@ const interviewerAuth = async (req: RequestModified, res: Response, next: NextFu
             req.interviewerId = interviewer?._id;
             next()
         }else {
+
             return res.status(401).send({success: false, message: "Unauthorized - Invalid Token"})
         }
     } catch (error) {

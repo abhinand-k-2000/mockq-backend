@@ -220,6 +220,20 @@ class CandidateUseCase {
     const analytics = await this.iCandidateRepository.getCandidateAnalytics(candidateId)
     return analytics
   }
+
+  async verifyVideoConference (roomId: string, userId: string) {
+    const interview = await this.iCandidateRepository.getScheduledInterviewByRoomId(roomId);
+    if(!interview) throw new AppError("Interview not found", 404)
+
+      console.log('roo: ', roomId, 'userId: ', userId)
+
+    if(interview.candidateId === userId || interview.interviewerId === userId) {
+      return true
+    }else {
+      return false
+    }
+
+  }
 }
 
 

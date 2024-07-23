@@ -273,6 +273,18 @@ class InterviewerUseCase {
     return details
   }
 
+  async verifyVideoConference (roomId: string, userId: string) {
+    const interview = await this.iInterviewerRepository.getScheduledInterviewByRoomId(roomId);
+    if(!interview) throw new AppError("Interview not found", 404)
+
+
+    if(interview.candidateId === userId || interview.interviewerId === userId) {
+      return true
+    }else {
+      return false
+    }
+  }
+
 
 
 

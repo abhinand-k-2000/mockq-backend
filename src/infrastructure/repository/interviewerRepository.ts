@@ -299,6 +299,11 @@ class InterviewerRepository implements IInterviewerRepository {
     return {interviews, totalRevenue}
   }
 
+  async getScheduledInterviewByRoomId(roomId: string): Promise<ScheduledInterview | null> {
+    const interview = await ScheduledInterviewModel.findOne({roomId: roomId})
+    return interview
+  }
+
 
 
 

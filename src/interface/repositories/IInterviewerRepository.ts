@@ -24,6 +24,9 @@ interface IInterviewerRepository {
     saveFeedback(feedbackDetails: Feedback): Promise<void >
 
     getPaymentDashboard(interviewerId: string): Promise<any>
+    
+    getScheduledInterviewByRoomId(roomId: string): Promise<ScheduledInterview | null>
+
 
 }
 

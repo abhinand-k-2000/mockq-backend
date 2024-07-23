@@ -308,6 +308,11 @@ class CandidateRepository implements ICandidateRepository {
 
     return interviewCounts
   }
+
+  async getScheduledInterviewByRoomId(roomId: string): Promise<ScheduledInterview | null> {
+    const interview = await ScheduledInterviewModel.findOne({roomId: roomId})
+    return interview
+  }
 }
 
 export default CandidateRepository;

@@ -304,6 +304,21 @@ class CandidateController {
       next(error)
     }
   }
+
+  async verifyVideoConference(req: Request, res: Response, next: NextFunction) {
+    try {
+      const {roomId, userId} = req.body
+      console.log('inside controller: ', roomId, userId)
+      if(!roomId || !userId) throw new AppError("Room ID and User ID are required", 400)
+
+      const isVerified  = await this.candidateCase.verifyVideoConference(roomId, userId)
+      if(!isVerified) throw new AppError("You are not authorized to join this video conference.", 400);
+
+      return res.status(200).json({success: true, message: "Video conference verified successfully"})
+    } catch (error) {
+      next(error)
+    }
+  }
 }   
  
 
