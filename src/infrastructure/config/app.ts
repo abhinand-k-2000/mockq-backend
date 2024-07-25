@@ -28,7 +28,7 @@ const createServer = () => {
     app.use(cookieParser());
     app.use(
       cors({
-        origin: "http://localhost:5173",
+        origin: "https://mockq.vercel.app/",
         credentials: true,
       })
     );
