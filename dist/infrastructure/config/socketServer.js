@@ -5,7 +5,8 @@ console.log("sockeet server funcditon");
 function socketServer(server) {
     const io = new socket_io_1.Server(server, {
         cors: {
-            origin: ["https://mockq.vercel.app/"],
+            origin: ["https://mockq.vercel.app"],
+            methods: ['GET', 'POST']
         },
     });
     io.on("connection", (socket) => {
