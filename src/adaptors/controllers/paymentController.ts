@@ -44,8 +44,7 @@ class PaymentController {
 
   async handleWebhook(req: Request, res: Response, next: NextFunction) {
 
-    const endpointSecret =
-      "whsec_e31411d4c8b0d765cd62b1e71d632bc38726b1142487eb8bd4f1f1a21cd1ce59";
+    const endpointSecret =process.env.STRIPE_WEBHOOK_SECRET!.toString();
     const sig: any = req.headers["stripe-signature"];
 
     let event;
@@ -65,20 +64,20 @@ class PaymentController {
         await this.paymentCase.handleSuccessfulPayment(session);
         break;
 
-        case "invoice.payment_succeeded":
-          console.log("Inside invoice.payment_succeeded"); 
-          const invoice = event.data.object;
-          
-          if(invoice.metadata && invoice.metadata.candidateId){
+      case "invoice.payment_succeeded":
+        console.log("Inside invoice.payment_succeeded"); 
+        const invoice = event.data.object;
+        
+        if(invoice.metadata && invoice.metadata.candidateId){
 
-            const candidateId = invoice.metadata.candidateId;
+          const candidateId = invoice.metadata.candidateId;
 
-            console.log("candidate id in switch : ", candidateId)
-            await this.paymentCase.handleSubscriptionPayment(invoice, candidateId)
-          }else {
-            console.warn('Invoice metadata or candidateId is missing');
-          }
-          break;
+          console.log("candidate id in switch : ", candidateId)
+          await this.paymentCase.handleSubscriptionPayment(invoice, candidateId)
+        }else {
+          console.warn('Invoice metadata or candidateId is missing');
+        }
+        break;
 
         default: 
           // console.log(`Unhandled event type ${event.type}`)
