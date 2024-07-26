@@ -43,14 +43,21 @@ class PaymentController {
   }
 
   async handleWebhook(req: Request, res: Response, next: NextFunction) {
-
     const endpointSecret =process.env.STRIPE_WEBHOOK_SECRET!.toString();
+
+    console.log('Received webhook request');
+  console.log('Headers:', req.headers);
+  console.log('Raw Body:', req.body.toString('utf8')); // Ensure this is a string for logging
+  console.log('endpoint: ', endpointSecret)
+
     const sig: any = req.headers["stripe-signature"];
 
     let event;
 
     try {
       event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+      console.log('Webhook signature verified successfully');
+
     } catch (error: any) {
       console.error(`Webhook signature verification failed: ${error.message}`);
       return res.status(400).send(`Webhook Error: ${error.message}`);
