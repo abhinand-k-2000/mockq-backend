@@ -15,6 +15,7 @@ const repository = new paymentRepository_1.default();
 const useCase = new paymentUseCase_1.default(stripe, repository);
 const controller = new paymentController_1.default(useCase);
 router.post('/create-payment', candidateAuth_1.default, (req, res, next) => controller.makePayment(req, res, next));
-router.post('/webhook', express_1.default.raw({ type: 'application/json' }), (req, res, next) => controller.handleWebhook(req, res, next));
+// router.post('/webhook', express.raw({type: ['application/json', 'application/json; charset=utf-8']}), (req, res, next ) => controller.handleWebhook(req, res, next))
+router.post('/webhook', (req, res, next) => controller.handleWebhook(req, res, next));
 router.post('/create-subscription', (req, res, next) => controller.createSubscription(req, res, next));
 exports.default = router;

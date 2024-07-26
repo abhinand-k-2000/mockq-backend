@@ -14,18 +14,31 @@ const createServer = () => {
   try {
     const app = express();
 
-    app.use( (req: Request, res: Response, next: NextFunction) => {
-      if(req.originalUrl === '/api/payment/webhook') {
-        next()
-      }else{ 
-        express.json()(req, res, next)
+    // app.use( (req: Request, res: Response, next: NextFunction) => {
+    //   if(req.originalUrl === '/api/payment/webhook') {
+    //     next()
+    //   }else{ 
+    //     express.json()(req, res, next)
+    //   }
+    // })
+    // app.use((req: Request, res: Response, next: NextFunction) => {
+    //   if (req.originalUrl === '/api/payment/webhook') {
+    //     express.raw({type: 'application/json'})(req, res, next);
+    //   } else {
+    //     express.json()(req, res, next);
+    //   }
+    // });
+    app.use((req: Request, res: Response, next: NextFunction) => {
+      if (req.originalUrl === '/api/payment/webhook') {
+        express.raw({type: ['application/json', 'application/json; charset=utf-8']})(req, res, next);
+      } else {
+        express.json()(req, res, next);
       }
-    })
+    });
 
-      
-      
+  
     app.use(express.urlencoded({ extended: true }));
-    
+
     app.use(cookieParser());
     app.use(
       cors({

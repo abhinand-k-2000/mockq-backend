@@ -15,7 +15,8 @@ const controller = new PaymentController(useCase)
 
 router.post('/create-payment', candidateAuthenticate, (req, res, next) => controller.makePayment(req, res, next))
 
-router.post('/webhook', express.raw({type: 'application/json'}), (req, res, next ) => controller.handleWebhook(req, res, next))
+// router.post('/webhook', express.raw({type: ['application/json', 'application/json; charset=utf-8']}), (req, res, next ) => controller.handleWebhook(req, res, next))
+router.post('/webhook', (req, res, next) => controller.handleWebhook(req, res, next));
 
 router.post('/create-subscription', (req, res, next) => controller.createSubscription(req, res, next))
 
