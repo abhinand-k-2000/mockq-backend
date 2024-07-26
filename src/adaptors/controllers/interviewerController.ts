@@ -122,6 +122,8 @@ class InterviewerController {
         res.cookie("interviewerToken", interviewer.data?.token, {
           expires: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // Expires in 2 days
           httpOnly: true,
+          secure: true, // use true if you're serving over https
+          sameSite: 'none' // allows cross-site cookie usage
         });
         res.status(200).json(interviewer);
       } else {
