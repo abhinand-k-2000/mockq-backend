@@ -39,7 +39,7 @@ class PaymentController {
         }
     }
     async handleWebhook(req, res, next) {
-        const endpointSecret = "whsec_e31411d4c8b0d765cd62b1e71d632bc38726b1142487eb8bd4f1f1a21cd1ce59";
+        const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET.toString();
         const sig = req.headers["stripe-signature"];
         let event;
         try {
