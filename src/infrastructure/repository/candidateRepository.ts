@@ -314,6 +314,8 @@ class CandidateRepository implements ICandidateRepository {
     const interview = await ScheduledInterviewModel.findOne({roomId: roomId})
     return interview
   }
+
+  
 }
 
 export default CandidateRepository;

@@ -14,6 +14,7 @@ import Interview from "../domain/entitites/interviewSlot";
 import InterviewSlot from "../domain/entitites/interviewSlot";
 import ScheduledInterview from "../domain/entitites/scheduledInterview";
 import Feedback from "../domain/entitites/feedBack";
+import INotificationRepository from "../interface/repositories/INotificationRepository";
 
 type DecodedToken = {
   info: { userId: string };
@@ -29,7 +30,8 @@ class InterviewerUseCase {
     private jwtToken: IJwtToken,
     private mailService: IMailService,
     private hashPassword: IHashPassword,
-    private fileStorageService: IFileStorageService
+    private fileStorageService: IFileStorageService,
+    private iNotificationRepository: INotificationRepository
   ) {}
 
   async findInterviewer(interviewerInfo: InterviewerProfile) {
@@ -263,7 +265,19 @@ class InterviewerUseCase {
 
 
   async saveFeedback(feedbacKDetails: Feedback) {
-    await this.iInterviewerRepository.saveFeedback(feedbacKDetails)
+    const {candidateId, } = feedbacKDetails
+    console.log('candidat id: ', candidateId)     
+    
+    const feeback = await this.iInterviewerRepository.saveFeedback(feedbacKDetails)
+    console.log("feedback in save feedbacK: ", feeback)
+    const notification = {
+      userId: candidateId,
+      heading: "Feedback Received",
+      message: "You have received a new feedback.",
+      feedbackId: feeback._id,
+      read: false
+    }
+    await this.iNotificationRepository.send(notification)
   }
 
   

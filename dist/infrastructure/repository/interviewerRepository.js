@@ -193,10 +193,11 @@ class InterviewerRepository {
             areaOfImprovement,
             additionalComments,
         });
-        await feedback.save();
-        const statusUpated = await scheduledInterviewModel_1.ScheduledInterviewModel.findByIdAndUpdate(interviewId, {
+        const feedbackSaved = await feedback.save();
+        await scheduledInterviewModel_1.ScheduledInterviewModel.findByIdAndUpdate(interviewId, {
             status: "Completed",
         });
+        return feedbackSaved;
     }
     async getPaymentDashboard(interviewerId) {
         // const interviews = await ScheduledInterviewModel.find({interviewerId: interviewerId})

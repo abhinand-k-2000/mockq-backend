@@ -11,6 +11,7 @@ import HashPassword from "../utils/hashPassword";
 import { uploadStorage } from "../middlewares/multer";
 import authenticate from "../middlewares/interviewerAuth"
 import FileStorageService from "../utils/fileStorageService";
+import NotificationRepository from "../repository/notificationRepository"
 
 
 const otp = new OtpGenerate()
@@ -19,8 +20,10 @@ const jwt = new JwtToken(process.env.JWT_SECRET as string)
 const mail = new MailService()
 const fileStorage = new FileStorageService()
 
-const respository = new InterviewerRepository()
-const interviewerCase = new InterviewerUseCase(respository, otp, jwt, mail, hash, fileStorage)
+
+const interviewerRespository = new InterviewerRepository()
+const notificationRepository = new NotificationRepository()
+const interviewerCase = new InterviewerUseCase(interviewerRespository, otp, jwt, mail, hash, fileStorage, notificationRepository)
 const controller = new InterviewerController(interviewerCase)
 
 

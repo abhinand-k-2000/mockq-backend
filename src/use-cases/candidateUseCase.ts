@@ -7,6 +7,7 @@ import IJwtToken from "../interface/utils/IJwtToken";
 import IMailService from "../interface/utils/IMailService";
 import IHashPassword from "../interface/utils/IhashPassword";
 import InterviewerRating from "../domain/entitites/interviewerRating";
+import INotificationRepository from "../interface/repositories/INotificationRepository";
 
 type DecodedToken = {
   info: { userId: string };
@@ -21,7 +22,8 @@ class CandidateUseCase {
     private otpGenerate: IGenerateOtp,
     private jwtToken: IJwtToken,
     private mailService: IMailService,
-    private hashPassword: IHashPassword
+    private hashPassword: IHashPassword,
+    private iNotificationRepository: INotificationRepository,
   ) {}
 
   async findCandidate(candidateInfo: Candidate) {
@@ -233,6 +235,11 @@ class CandidateUseCase {
       return false
     }
 
+  }
+
+  async getNotifications(userId: string) {
+    const list = await this.iNotificationRepository.fetchAll(userId)
+    return list
   }
 }
 

@@ -5,13 +5,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const appError_1 = __importDefault(require("../infrastructure/utils/appError"));
 class InterviewerUseCase {
-    constructor(iInterviewerRepository, otpGenerate, jwtToken, mailService, hashPassword, fileStorageService) {
+    constructor(iInterviewerRepository, otpGenerate, jwtToken, mailService, hashPassword, fileStorageService, iNotificationRepository) {
         this.iInterviewerRepository = iInterviewerRepository;
         this.otpGenerate = otpGenerate;
         this.jwtToken = jwtToken;
         this.mailService = mailService;
         this.hashPassword = hashPassword;
         this.fileStorageService = fileStorageService;
+        this.iNotificationRepository = iNotificationRepository;
     }
     async findInterviewer(interviewerInfo) {
         const { email, name } = interviewerInfo;
@@ -169,7 +170,18 @@ class InterviewerUseCase {
         return interview;
     }
     async saveFeedback(feedbacKDetails) {
-        await this.iInterviewerRepository.saveFeedback(feedbacKDetails);
+        const { candidateId, } = feedbacKDetails;
+        console.log('candidat id: ', candidateId);
+        const feeback = await this.iInterviewerRepository.saveFeedback(feedbacKDetails);
+        console.log("feedback in save feedbacK: ", feeback);
+        const notification = {
+            userId: candidateId,
+            heading: "Feedback Received",
+            message: "You have received a new feedback.",
+            feedbackId: feeback._id,
+            read: false
+        };
+        await this.iNotificationRepository.send(notification);
     }
     async getPaymentDashboard(interviewerId) {
         const details = await this.iInterviewerRepository.getPaymentDashboard(interviewerId);

@@ -314,6 +314,7 @@ class InterviewerController {
     async saveFeedbackDetails(req, res, next) {
         try {
             const { fullDetails } = req.body;
+            console.log('indise feedback', fullDetails);
             const feedBack = await this.interviewerCase.saveFeedback(fullDetails);
             return res.status(201).json({ success: true, message: "Feedback uploaded successfully" });
         }

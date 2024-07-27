@@ -5,12 +5,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const appError_1 = __importDefault(require("../infrastructure/utils/appError"));
 class CandidateUseCase {
-    constructor(iCandidateRepository, otpGenerate, jwtToken, mailService, hashPassword) {
+    constructor(iCandidateRepository, otpGenerate, jwtToken, mailService, hashPassword, iNotificationRepository) {
         this.iCandidateRepository = iCandidateRepository;
         this.otpGenerate = otpGenerate;
         this.jwtToken = jwtToken;
         this.mailService = mailService;
         this.hashPassword = hashPassword;
+        this.iNotificationRepository = iNotificationRepository;
     }
     async findCandidate(candidateInfo) {
         const candidateFound = await this.iCandidateRepository.findByEmail(candidateInfo.email);
@@ -169,6 +170,10 @@ class CandidateUseCase {
         else {
             return false;
         }
+    }
+    async getNotifications(userId) {
+        const list = await this.iNotificationRepository.fetchAll(userId);
+        return list;
     }
 }
 exports.default = CandidateUseCase;

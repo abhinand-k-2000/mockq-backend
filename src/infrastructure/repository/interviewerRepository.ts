@@ -246,7 +246,7 @@ class InterviewerRepository implements IInterviewerRepository {
     return interview[0];
   }
 
-  async saveFeedback(feedbackDetails: Feedback): Promise<void> {
+  async saveFeedback(feedbackDetails: Feedback): Promise<Feedback> {
     const {
       interviewId,
       interviewerId,
@@ -271,14 +271,17 @@ class InterviewerRepository implements IInterviewerRepository {
       additionalComments,
     });
 
-    await feedback.save();
+    const feedbackSaved = await feedback.save();
 
-    const statusUpated = await ScheduledInterviewModel.findByIdAndUpdate(
+     await ScheduledInterviewModel.findByIdAndUpdate(
       interviewId,
       {
         status: "Completed",
       }
     );
+
+    return feedbackSaved
+    
   }
 
   async getPaymentDashboard(interviewerId: string): Promise<any> {

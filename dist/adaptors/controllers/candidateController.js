@@ -86,8 +86,8 @@ class CandidateController {
                 res.cookie('candidateToken', candidate.data?.token, {
                     expires: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // Expires in 2 days
                     httpOnly: true,
-                    secure: true, // use true if you're serving over https
-                    sameSite: 'none' // allows cross-site cookie usage
+                    // secure: true, // use true if you're serving over https
+                    // sameSite: 'none' // allows cross-site cookie usage
                 });
                 res.status(200).json(candidate);
             }
@@ -266,6 +266,18 @@ class CandidateController {
             if (!isVerified)
                 throw new appError_1.default("You are not authorized to join this video conference.", 400);
             return res.status(200).json({ success: true, message: "Video conference verified successfully" });
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    async getNotifications(req, res, next) {
+        try {
+            const candidateId = req.candidateId;
+            if (!candidateId)
+                throw new appError_1.default("candidate id not found", 400);
+            const list = await this.candidateCase.getNotifications(candidateId);
+            return res.status(200).json({ success: true, data: list });
         }
         catch (error) {
             next(error);
