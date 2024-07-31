@@ -1,5 +1,5 @@
 import {
-  InterviewerProfile,
+  // InterviewerProfile,
   InterviewerRegistration,
 } from "../domain/entitites/interviewer";
 import IInterviewerRepository from "../interface/repositories/IInterviewerRepository";
@@ -31,10 +31,10 @@ class InterviewerUseCase {
     private mailService: IMailService,
     private hashPassword: IHashPassword,
     private fileStorageService: IFileStorageService,
-    private iNotificationRepository: INotificationRepository
+    private iNotificationRepository: INotificationRepository,
   ) {}
 
-  async findInterviewer(interviewerInfo: InterviewerProfile) {
+  async findInterviewer(interviewerInfo: InterviewerRegistration) {
     const { email, name } = interviewerInfo;
     const interviewerFound = await this.iInterviewerRepository.findByEmail(
       email
@@ -199,8 +199,8 @@ class InterviewerUseCase {
   }
 
 
-  async getInterviewSlots(interviewerId: string, page: number, limit: number) {
-    const {slots, total} = await this.iInterviewerRepository.getInterviewSlots(interviewerId, page, limit)
+  async getInterviewSlots(interviewerId: string, page: number, limit: number, searchQuery: string) {
+    const {slots, total} = await this.iInterviewerRepository.getInterviewSlots(interviewerId, page, limit, searchQuery)
     return {slots, total}
   }
 
@@ -297,6 +297,22 @@ class InterviewerUseCase {
     }else {
       return false
     }
+  }
+
+  async editProfile(interviewerId: string, details: InterviewerRegistration) {
+    await this.iInterviewerRepository.editProfile(interviewerId, details)
+  }
+
+
+  async editPassword(interviewerId: string, oldPassword: string,  newPassword: string) {
+    
+    const interviewer = await this.iInterviewerRepository.findInterviewerById(interviewerId);
+    if(!interviewer) throw new AppError("Interviewer not found ", 400)
+    const isPasswordMatch = await this.hashPassword.compare(oldPassword, interviewer?.password)
+    if(!isPasswordMatch) throw new AppError("Current password is incorrect. Please check and try again.", 400)
+    
+    const hashedPassword = await this.hashPassword.hash(newPassword)
+    await this.iInterviewerRepository.updatePassword(interviewerId, hashedPassword)
   }
 
 

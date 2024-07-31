@@ -5,6 +5,7 @@ interface Candidate {
     email: string;
     mobile: number;
     password: string;
+    profilePic?: string;
     isBlocked: boolean;
     isPremium: boolean;
     subscriptionType: string;

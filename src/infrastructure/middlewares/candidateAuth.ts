@@ -37,7 +37,8 @@ const candidateAuth = async (req: Request, res: Response, next: NextFunction) =>
         if(decodedToken && decodedToken.id){
             const candidate = await candidateRepository.findCandidateById(decodedToken.id)
             if(candidate?.isBlocked){
-                return res.status(401).send({success: false, message: "You are blocked!"})
+                res.clearCookie("candidateToken")
+                return res.status(403).send({success: false, message: "You are blocked!"})
             }
             req.candidateId = candidate?._id;
             next()

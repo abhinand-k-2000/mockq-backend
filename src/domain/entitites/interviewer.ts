@@ -18,15 +18,15 @@ export interface InterviewerRegistration {
     
 }
 
-export interface InterviewerProfile extends InterviewerRegistration {
-    organisation?: string;
-    currentDesignation?: string;
-    yearsOfExperience?: string;
-    collegeUniversity?: string;
-    profilePicture?: string;
-    salarySlip?: string;
-    resume?: string;
-    introduction?: string;
-}   
+// export interface InterviewerProfile extends InterviewerRegistration {
+//     organisation?: string;
+//     currentDesignation?: string;
+//     yearsOfExperience?: string;
+//     collegeUniversity?: string;
+//     profilePicture?: string;
+//     salarySlip?: string;
+//     resume?: string;
+//     introduction?: string;
+// }   
 
 

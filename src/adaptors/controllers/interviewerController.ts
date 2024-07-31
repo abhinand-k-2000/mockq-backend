@@ -278,13 +278,15 @@ class InterviewerController {
     try {
       const page = req.query.page ? parseInt(req.query.page as string) : 1;
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 5
+      const searchQuery = req.query.searchQuery ? req.query.searchQuery as string : '';
       const interviewerId = req.interviewerId;
       if (!interviewerId) {
         throw new AppError("Unauthorized user", 401);
       }
+
       const {slots, total} = await this.interviewerCase.getInterviewSlots(
         interviewerId,
-        page, limit
+        page, limit, searchQuery
       );
       return res
         .status(200)
@@ -416,6 +418,35 @@ class InterviewerController {
       if(!isVerified) throw new AppError("You are not authorized to join this video conference.", 400);
 
       return res.status(200).json({success: true, message: "Video conference verified successfully"})
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async editProfile(req: Request, res: Response, next: NextFunction) {
+    try {
+      console.log(req.body)
+      const {details} = req.body;
+      const interviewerId = req.interviewerId;
+      if(!interviewerId) throw new AppError("Interviewer id not found", 400);
+      if (!details) throw new AppError("Details not provided", 400);
+
+      await this.interviewerCase.editProfile(interviewerId, details)
+      return res.status(200).json({success: true, message: "Profile updated successfully"})
+
+    } catch (error) {
+      next(error)
+    }
+  }
+
+
+  async editPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const interviewerId = req.interviewerId;
+      const {currentPassword, newPassword} = req.body
+      if(!interviewerId) throw new AppError("interviewer id not found", 400);
+      await this.interviewerCase.editPassword(interviewerId, currentPassword,  newPassword)
+      return res.status(200).send({success: true, message: "Password changed successfully"})
     } catch (error) {
       next(error)
     }

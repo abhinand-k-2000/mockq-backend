@@ -12,7 +12,7 @@ interface IInterviewerRepository {
     saveInterviewerDetails(interviewerDetails: InterviewerRegistration): Promise<InterviewerRegistration | null>
     findById(id: string): Promise<InterviewerRegistration | null>
     saveInterviewSlot(slotData: InterviewSlot): Promise<InterviewSlot | null>
-    getInterviewSlots(interviewerId: string, page: number, limit: number): Promise<{slots: InterviewSlot[] | null, total: number}>
+    getInterviewSlots(interviewerId: string, page: number, limit: number, searchQuery: string): Promise<{slots: InterviewSlot[] | null, total: number}>
     getDomains():Promise<Stack[] | null>
 
     updatePassword(interviewerId: string, password: string): Promise<void | null>
@@ -26,6 +26,8 @@ interface IInterviewerRepository {
     getPaymentDashboard(interviewerId: string): Promise<any>
     
     getScheduledInterviewByRoomId(roomId: string): Promise<ScheduledInterview | null>
+
+    editProfile(interviewerId: string, details: InterviewerRegistration): Promise<void>
 
 
 }

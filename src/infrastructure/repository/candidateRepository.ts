@@ -315,6 +315,23 @@ class CandidateRepository implements ICandidateRepository {
     return interview
   }
 
+  async editProfile(candidateId: string, name: string, mobile: number, profilePicUrl: string | null): Promise<void> {
+
+    if(!profilePicUrl){
+      await CandidateModel.findByIdAndUpdate(candidateId, {
+        name: name,
+        mobile: mobile,
+      })
+      return
+    }
+    await CandidateModel.findByIdAndUpdate(candidateId, {
+      name: name,
+      mobile: mobile,
+      profilePic: profilePicUrl
+    })
+
+  }
+
   
 }
 

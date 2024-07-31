@@ -10,6 +10,8 @@ import JwtToken from "../utils/JwtToken"
 import MailService from "../utils/mailService"
 import HashPassword from "../utils/hashPassword"
 import candidateAuthenticate from "../middlewares/candidateAuth"
+import { uploadStorage } from "../middlewares/multer"
+import FileStorageService from "../utils/fileStorageService"
 
 const candidateRepository = new CandidateRepository()
 const notificationRepository = new NotificationRepository()
@@ -17,8 +19,9 @@ const otp = new OtpGenerate()
 const jwt = new JwtToken(process.env.JWT_SECRET as string)
 const mail = new MailService()
 const hashPassword = new HashPassword()
+const fileStorage = new FileStorageService()
 
-const candidateCase = new CandidateUseCase(candidateRepository, otp, jwt, mail, hashPassword, notificationRepository)
+const candidateCase = new CandidateUseCase(candidateRepository, otp, jwt, mail, hashPassword, notificationRepository, fileStorage)
 const controller = new CandidateController(candidateCase)
 
 router.post('/verify-email', (req, res, next) => {controller.verifyCadidateEmail(req, res, next)})
@@ -54,6 +57,12 @@ router.get('/get-analytics', candidateAuthenticate, (req, res, next) => controll
 router.post('/verify-video-conference', candidateAuthenticate, (req, res, next) => controller.verifyVideoConference(req, res, next))
 
 router.get('/get-notifications', candidateAuthenticate, (req, res, next) => controller.getNotifications(req, res, next))
+
+router.get('/get-profile', candidateAuthenticate, (req, res, next) => controller.getProfileDetails(req, res, next))
+
+router.put('/edit-profile', candidateAuthenticate, uploadStorage.single('profilePic'), (req, res, next) => controller.editProfile(req, res, next) )
+
+router.put('/edit-password', candidateAuthenticate,  (req, res, next) => controller.editPassword(req, res, next) )
 
 
 export default router   

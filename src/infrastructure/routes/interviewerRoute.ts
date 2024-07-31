@@ -68,7 +68,9 @@ router.get('/get-payment-dashboard', authenticate, (req, res, next) => controlle
 
 router.post('/verify-video-conference', authenticate, (req, res, next) => controller.verifyVideoConference(req, res, next))
 
+router.put('/edit-profile', authenticate, (req, res, next) => controller.editProfile(req, res, next))
 
+router.put('/edit-password', authenticate, (req, res, next) => controller.editPassword(req, res, next))
 
     
 

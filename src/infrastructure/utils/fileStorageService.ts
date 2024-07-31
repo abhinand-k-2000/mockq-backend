@@ -14,7 +14,7 @@ AWS.config.update({
 
 
 class FileStorageService implements IFileStorageService {
-    async uploadFile(file: any, keyPrefix: string): Promise<string> {
+    async uploadFile(file: any, keyPrefix: string): Promise<string> {      
         const params = {
             Bucket: process.env.AWS_S3_BUCKET_NAME!,
             Key: `${keyPrefix}/${Date.now()}-${file[0].originalname}`,

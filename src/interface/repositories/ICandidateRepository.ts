@@ -38,6 +38,10 @@ interface ICandidateRepository {
     getCandidateAnalytics(candidateId: string): Promise<any>
 
     getScheduledInterviewByRoomId(roomId: string): Promise<ScheduledInterview | null>
+
+    editProfile(candidateId: string, name: string, mobile: number,  profilePicUrl: string | null): Promise<void>
+
+    
 }
 
 export default ICandidateRepository  

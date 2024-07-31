@@ -38,7 +38,7 @@ class InterviewerRepository implements IInterviewerRepository {
   async findInterviewerById(
     id: string
   ): Promise<InterviewerRegistration | null> {
-    const interviewerData = await InterviewerModel.findById(id, "-password");
+    const interviewerData = await InterviewerModel.findById(id);
     if (!interviewerData) {
       throw new AppError("Interviewer not found", 404);
     }
@@ -136,47 +136,65 @@ class InterviewerRepository implements IInterviewerRepository {
 
   async getInterviewSlots(
     interviewerId: string,
-    page: number, limit: number
-  ): Promise<{slots: InterviewSlot[] | null, total: number}> {
+    page: number,
+    limit: number,
+    searchQuery: string
+  ): Promise<{ slots: InterviewSlot[]; total: number }> {
+console.log(searchQuery)
+    const pipeline: any[] = [
+      {
+        $match: { interviewerId: interviewerId.toString() }
+      },
+      {
+        $unwind: "$slots"
+      },
+    ];
 
-    const slotsList = await InterviewSlotModel.aggregate([
-      {
-        $match: { interviewerId: interviewerId.toString() },
-      },
-      {
-        $unwind: "$slots",
-      },
+    console.log(await InterviewSlotModel.aggregate(pipeline))
+  
+    if (searchQuery) {
+      pipeline.push({
+        $match: {
+          $or: [
+            {"slots.schedule.title": {$regex: searchQuery, $options: "i"}},
+            {"slots.schedule.technologies": {$elemMatch: {$regex: searchQuery, $options: "i"}}}
+          ]
+        }
+      });
+    }
+  
+    pipeline.push(
       {
         $project: {
           _id: 0,
           date: "$slots.date",
-          schedule: "$slots.schedule",
-        },
+          schedule: "$slots.schedule"
+        }
       },
       {
-        $sort: { date: -1 },
-      },
+        $sort: { date: -1 }
+      }
+    );
+  
+    const totalPipeline = [...pipeline, { $count: "total" }];
+    const [totalResult] = await InterviewSlotModel.aggregate(totalPipeline);
+    const total = totalResult ? totalResult.total : 0;
+  
+    pipeline.push(
       {
-        $skip: page - 1 
+        $skip: (page - 1) * limit
       },
       {
         $limit: limit
       }
-    ]);
-    const totalDocs = await InterviewSlotModel.aggregate([
-      {
-        $match: { interviewerId: interviewerId.toString() },
-      },
-      { 
-        $unwind: "$slots",
-      },
-      {
-        $count: "totalCount"
-      }
-    ]);
-
-    return {slots: slotsList, total: totalDocs[0].totalCount};
+    );
+  
+    const slots = await InterviewSlotModel.aggregate(pipeline);
+  
+    return { slots, total };
   }
+  
+  
 
   async getDomains(): Promise<Stack[] | null> {
     const domainList = await StackModel.find();
@@ -328,6 +346,18 @@ class InterviewerRepository implements IInterviewerRepository {
   async getScheduledInterviewByRoomId(roomId: string): Promise<ScheduledInterview | null> {
     const interview = await ScheduledInterviewModel.findOne({roomId: roomId})
     return interview
+  }
+
+  async editProfile(interviewerId: string, details: InterviewerRegistration): Promise<void> {
+    const {name, mobile, currentDesignation, organisation, yearsOfExperience, introduction} = details
+    await InterviewerModel.findByIdAndUpdate(interviewerId, {
+      name,
+      mobile, 
+      currentDesignation,
+      organisation,
+      yearsOfExperience, 
+      introduction
+    })
   }
 
 

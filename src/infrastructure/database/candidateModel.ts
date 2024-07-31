@@ -20,6 +20,9 @@ const candidateSchema: Schema<Candidate> = new Schema({
         type: String,
         required: true
     },
+    profilePic: {
+        type: String
+    },
     isBlocked: {
         type: Boolean,
         default: false

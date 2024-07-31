@@ -8,6 +8,7 @@ import IMailService from "../interface/utils/IMailService";
 import IHashPassword from "../interface/utils/IhashPassword";
 import InterviewerRating from "../domain/entitites/interviewerRating";
 import INotificationRepository from "../interface/repositories/INotificationRepository";
+import IFileStorageService from "../interface/utils/IFileStorageService";
 
 type DecodedToken = {
   info: { userId: string };
@@ -24,6 +25,7 @@ class CandidateUseCase {
     private mailService: IMailService,
     private hashPassword: IHashPassword,
     private iNotificationRepository: INotificationRepository,
+    private fileStorageService: IFileStorageService
   ) {}
 
   async findCandidate(candidateInfo: Candidate) {
@@ -240,6 +242,31 @@ class CandidateUseCase {
   async getNotifications(userId: string) {
     const list = await this.iNotificationRepository.fetchAll(userId)
     return list
+  }
+
+
+  async getProfileDetails(candidateId: string) {
+    const candidate = await this.iCandidateRepository.findCandidateById(candidateId);
+    return candidate
+  }
+
+  async editProfile(candidateId: string, name: string, mobile: number, profilePic: Express.Multer.File[] | []) {
+    let profilePicUrl = null
+    if(profilePic.length > 0) {
+      profilePicUrl = await this.fileStorageService.uploadFile(profilePic, "profilePictures")
+    }
+    await this.iCandidateRepository.editProfile(candidateId, name, mobile, profilePicUrl)
+  }
+
+  async editPassword(candidateId: string, oldPassword: string,  newPassword: string) {
+    
+    const candidate = await this.iCandidateRepository.findCandidateById(candidateId);
+    if(!candidate) throw new AppError("Candidate not found ", 400)
+    const isPasswordMatch = await this.hashPassword.compare(oldPassword, candidate?.password)
+    if(!isPasswordMatch) throw new AppError("Current password is incorrect. Please check and try again.", 400)
+    
+    const hashedPassword = await this.hashPassword.hash(newPassword)
+    await this.iCandidateRepository.updatePassword(candidateId, hashedPassword)
   }
 }
 

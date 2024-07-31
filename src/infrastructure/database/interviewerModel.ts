@@ -1,8 +1,8 @@
 import mongoose, {Model, Schema} from 'mongoose'
-import {InterviewerProfile, InterviewerRegistration} from '../../domain/entitites/interviewer'
+import { InterviewerRegistration} from '../../domain/entitites/interviewer'
 
 
-const interviewerSchema: Schema<InterviewerProfile> = new Schema({
+const interviewerSchema: Schema<InterviewerRegistration> = new Schema({
     name: {
         type: String,
         required: true
@@ -57,5 +57,5 @@ const interviewerSchema: Schema<InterviewerProfile> = new Schema({
     }
 })
 
-const InterviewerModel: Model<InterviewerProfile> = mongoose.model("Interviewer", interviewerSchema)
+const InterviewerModel: Model<InterviewerRegistration> = mongoose.model("Interviewer", interviewerSchema)
 export {InterviewerModel}
