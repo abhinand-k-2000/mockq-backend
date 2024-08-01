@@ -30,7 +30,7 @@ const createServer = () => {
     app.use(
       cors({
         // origin: ["http://localhost:5173"],
-        origin: ["https://www.mockq.vercel.app"],
+        origin: ["https://mockq.vercel.app"], 
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         credentials: true,
       })
