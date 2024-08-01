@@ -10,7 +10,7 @@ class MailService {
             service: "gmail",
             auth: {
                 user: process.env.MAIL,
-                pass: process.env.MAIL_PASSWORD
+                pass: process.env.MAIL_PASSWORD,
             },
         });
     }
@@ -36,6 +36,27 @@ class MailService {
             subject: "MockQ Verification Code ✔", // Subject line
             text: emailContent,
             html: emailContent, // html body
+        });
+    }
+    async sendInterviewRemainder(name, email, startTime) {
+        const emailContent = `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: black">
+        <h2 style="color: #007bff;">Dear ${name},</h2>
+        <p>This is a reminder that your interview is scheduled to start at ${startTime.toLocaleTimeString()}.</p>
+        <p>Please ensure you are prepared and ready at the scheduled time. We wish you the best of luck!</p>
+        <p>Thank you for using <strong>MockQ</strong>. We look forward to assisting you with your interview preparation!</p>
+        <p>Best regards,<br/><strong>MockQ</strong></p>
+        <div style="margin-top: 20px; border-top: 1px solid #eaeaea; padding-top: 10px;">
+          <p style="font-size: 0.9em; color: #777;">This email was sent to ${email}. If you did not request this email, please ignore it.</p>
+        </div>
+      </div>
+    `;
+        const info = await this.transporter.sendMail({
+            from: process.env.MAIL,
+            to: email,
+            subject: "MockQ Interview Reminder ✔",
+            text: emailContent,
+            html: emailContent
         });
     }
 }

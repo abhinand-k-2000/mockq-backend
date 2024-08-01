@@ -14,6 +14,7 @@ const http_1 = __importDefault(require("http"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const errorMiddleware_1 = __importDefault(require("../middlewares/errorMiddleware"));
 const socketServer_1 = __importDefault(require("./socketServer"));
+require("../../infrastructure/cron_jobs/sendEmailReminder");
 const createServer = () => {
     try {
         const app = (0, express_1.default)();

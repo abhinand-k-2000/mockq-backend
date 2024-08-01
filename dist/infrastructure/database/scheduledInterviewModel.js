@@ -70,6 +70,10 @@ const ScheduledInterviewSchema = new mongoose_1.Schema({
     interviewerRatingAdded: {
         type: Boolean,
         default: false
+    },
+    reminderSent: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true });
 const ScheduledInterviewModel = mongoose_1.default.model("SchduledInterview", ScheduledInterviewSchema);

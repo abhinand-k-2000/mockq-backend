@@ -22,7 +22,9 @@ class AdminRepository {
         await newAdmin.save();
     }
     async findAllCandidates(page, limit) {
-        const candidatesList = await candidateModel_1.CandidateModel.find().skip((page - 1) * limit).limit(limit);
+        const candidatesList = await candidateModel_1.CandidateModel.find()
+            .skip((page - 1) * limit)
+            .limit(limit);
         const total = await candidateModel_1.CandidateModel.find().countDocuments();
         if (!candidatesList) {
             throw new appError_1.default("Failed to fetch candidates from database", 500);
@@ -30,7 +32,9 @@ class AdminRepository {
         return { candidates: candidatesList, total };
     }
     async findAllInterviewers(page, limit) {
-        const interviewersList = await interviewerModel_1.InterviewerModel.find().skip((page - 1) * limit).limit(limit);
+        const interviewersList = await interviewerModel_1.InterviewerModel.find()
+            .skip((page - 1) * limit)
+            .limit(limit);
         const total = await interviewerModel_1.InterviewerModel.find().countDocuments();
         if (!interviewersList) {
             throw new appError_1.default("Failed to fetch interviewers from database", 500);
@@ -81,7 +85,9 @@ class AdminRepository {
         return true;
     }
     async findAllStacks(page, limit) {
-        const stacksList = await stackModel_1.StackModel.find().skip((page - 1) * limit).limit(limit);
+        const stacksList = await stackModel_1.StackModel.find()
+            .skip((page - 1) * limit)
+            .limit(limit);
         const total = await stackModel_1.StackModel.find().countDocuments();
         if (!stacksList) {
             throw new appError_1.default("Failed to fetch stacks from database", 500);
@@ -101,7 +107,7 @@ class AdminRepository {
                 },
             },
             {
-                $unwind: "$interviewer"
+                $unwind: "$interviewer",
             },
             {
                 $project: {
@@ -119,12 +125,13 @@ class AdminRepository {
                 },
             },
             {
-                $unwind: "$candidate"
+                $unwind: "$candidate",
             },
             { $project: { "candidate.password": 0 } },
             {
-                $skip: (page - 1) * limit
-            }, { $limit: limit }
+                $skip: (page - 1) * limit,
+            },
+            { $limit: limit },
         ]);
         const total = await scheduledInterviewModel_1.ScheduledInterviewModel.find().countDocuments();
         return { interviews, total };
@@ -134,20 +141,57 @@ class AdminRepository {
         const candidatesCount = await candidateModel_1.CandidateModel.find().countDocuments();
         const interviews = await scheduledInterviewModel_1.ScheduledInterviewModel.aggregate([
             {
-                $group: { _id: '$status', total: { $sum: 1 } }
-            }
+                $group: { _id: "$status", total: { $sum: 1 } },
+            },
         ]);
         const interviewsCount = { completed: 0, scheduled: 0 };
         interviews.forEach((int) => {
-            if (int._id === 'Completed') {
+            if (int._id === "Completed") {
                 interviewsCount.completed = int.total;
             }
-            else if (int._id === 'Scheduled') {
+            else if (int._id === "Scheduled") {
                 interviewsCount.scheduled = int.total;
             }
         });
         const scheduledInterviews = await scheduledInterviewModel_1.ScheduledInterviewModel.find();
-        return { interviewersCount, candidatesCount, interviewsCount, scheduledInterviews };
+        return {
+            interviewersCount,
+            candidatesCount,
+            interviewsCount,
+            scheduledInterviews,
+        };
+    }
+    async findInterviewsStartingBetween(startTime, endTime) {
+        console.log('start: ', startTime);
+        console.log('end: ', endTime);
+        // const interviews = await ScheduledInterviewModel.find({fromTime: {$gte: startTime, $lte: endTime}})
+        const interviews = await scheduledInterviewModel_1.ScheduledInterviewModel.aggregate([
+            {
+                $match: {
+                    fromTime: { $gte: startTime, $lte: endTime },
+                    reminderSent: { $ne: true }
+                }
+            },
+            {
+                $lookup: {
+                    from: "candidates",
+                    let: { candidateId: { $toObjectId: "$candidateId" } },
+                    pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$candidateId"] } } }],
+                    as: "candidate",
+                },
+            },
+            {
+                $unwind: "$candidate",
+            },
+            { $project: { "candidate.password": 0 } },
+        ]);
+        console.log(interviews);
+        if (interviews.length > 0) {
+            const interviewIds = interviews.map(interview => interview._id);
+            await scheduledInterviewModel_1.ScheduledInterviewModel.updateMany({ _id: { $in: interviewIds } }, { $set: { reminderSent: true } });
+        }
+        console.log(interviews);
+        return interviews;
     }
 }
 exports.default = AdminRepository;

@@ -5,9 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const appError_1 = __importDefault(require("../infrastructure/utils/appError"));
 class AdminUseCase {
-    constructor(iAdminRepository, jwtToken) {
+    constructor(iAdminRepository, jwtToken, mailService) {
         this.iAdminRepository = iAdminRepository;
         this.jwtToken = jwtToken;
+        this.mailService = mailService;
     }
     async adminLogin(email, password) {
         const adminFound = await this.iAdminRepository.findByEmail(email);
@@ -75,6 +76,15 @@ class AdminUseCase {
     async getDashboardDetails() {
         const details = await this.iAdminRepository.dashboardDetails();
         return details;
+    }
+    async execute() {
+        const now = new Date();
+        const tenMinutesLater = new Date(now.getTime() + 10 * 60 * 1000);
+        const upComingInterviews = await this.iAdminRepository.findInterviewsStartingBetween(now, tenMinutesLater);
+        for (const interview of upComingInterviews) {
+            const { candidate } = interview;
+            await this.mailService.sendInterviewRemainder(candidate.name, candidate.email, new Date());
+        }
     }
 }
 exports.default = AdminUseCase;
