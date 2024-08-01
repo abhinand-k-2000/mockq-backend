@@ -11,8 +11,16 @@ interface ScheduledInterview {
     status: string;
     roomId: string;
     interviewerRatingAdded: boolean
+    reminderSent: boolean
 }     
 
+interface candidate {
+    name: string;
+    email: string
+}
+export interface AggregatedScheduledInterview extends ScheduledInterview {
+    candidate: candidate
+}
 
 
 export default ScheduledInterview

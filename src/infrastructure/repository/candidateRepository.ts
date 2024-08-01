@@ -135,19 +135,19 @@ class CandidateRepository implements ICandidateRepository {
           
         },   
       },
-      {
-        $match: {
-          $or: [
-            { "slots.date": { $gt: new Date() } }, // Future dates
-            {
-              $and: [
-                { "slots.date": { $eq: new Date().toISOString().split("T")[0] } }, // Today's date
-                { "slots.schedule.timeTo": { $gte: new Date() } }, // Times that are not in the past
-              ],
-            },
-          ],
-        },
-      },
+      // {
+      //   $match: {
+      //     $or: [
+      //       { "slots.date": { $gt: new Date() } }, // Future dates
+      //       {
+      //         $and: [
+      //           { "slots.date": { $eq: new Date().toISOString().split("T")[0] } }, // Today's date
+      //           { "slots.schedule.timeTo": { $gte: new Date() } }, // Times that are not in the past
+      //         ],
+      //       },
+      //     ],
+      //   },
+      // },
       {
         $sort: {"slots.date": 1}
       }

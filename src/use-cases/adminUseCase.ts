@@ -2,11 +2,13 @@ import Admin from "../domain/entitites/admin";
 import AppError from "../infrastructure/utils/appError";
 import IAdminRepository from "../interface/repositories/IAdminRepository";
 import IJwtToken from "../interface/utils/IJwtToken";
+import IMailService from "../interface/utils/IMailService";
 
 class AdminUseCase {
   constructor(
     public iAdminRepository: IAdminRepository,
-    private jwtToken: IJwtToken
+    private jwtToken: IJwtToken,
+    private mailService: IMailService
   ) {}
 
   async adminLogin(email: string, password: string) {
@@ -104,6 +106,17 @@ class AdminUseCase {
   async getDashboardDetails() {
     const details = await this.iAdminRepository.dashboardDetails()
     return details
+  }
+
+  async execute() {
+    const now = new Date();
+    const tenMinutesLater = new Date(now.getTime() + 10 * 60 * 1000);
+    const upComingInterviews = await this.iAdminRepository.findInterviewsStartingBetween(now, tenMinutesLater);
+
+    for(const interview of upComingInterviews) {
+      const {candidate} = interview
+      await this.mailService.sendInterviewRemainder(candidate.name, candidate.email, new Date())
+    }
   }
 }
 

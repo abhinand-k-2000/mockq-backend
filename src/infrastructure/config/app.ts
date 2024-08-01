@@ -9,6 +9,7 @@ import http from "http";
 import cookieParser from "cookie-parser";
 import errorMiddleware from "../middlewares/errorMiddleware";
 import socketServer from "./socketServer";
+import "../../infrastructure/cron_jobs/sendEmailReminder"
 
 const createServer = () => {
   try {
@@ -40,6 +41,8 @@ const createServer = () => {
     app.use("/api/interviewer", interviewerRoute);
     app.use("/api/payment", paymentRoute);
     app.use('/api/chat', chatRoute)
+
+
 
     app.use(errorMiddleware);
     const server = http.createServer(app);

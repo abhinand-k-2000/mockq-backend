@@ -1,7 +1,7 @@
 import Admin from '../../domain/entitites/admin'
 import Candidate from '../../domain/entitites/candidate'
 import { InterviewerRegistration } from '../../domain/entitites/interviewer'
-import ScheduledInterview from '../../domain/entitites/scheduledInterview'
+import ScheduledInterview, { AggregatedScheduledInterview } from '../../domain/entitites/scheduledInterview'
 import Stack from '../../domain/entitites/stack'
 
 
@@ -26,6 +26,8 @@ interface IAdminRepository {
     findAllInterviews(page: number, limit: number): Promise<{interviews: ScheduledInterview[] | null, total: number}>
 
     dashboardDetails() : Promise<any>
+
+    findInterviewsStartingBetween(startTime: Date, endTime: Date): Promise<AggregatedScheduledInterview[]>
 
 }
 

@@ -46,6 +46,10 @@ const ScheduledInterviewSchema = new Schema<ScheduledInterview>({
   interviewerRatingAdded: {
     type: Boolean,
     default: false
+  },
+  reminderSent: {
+    type: Boolean,
+    default: false
   }
 }, {timestamps: true});
 

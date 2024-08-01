@@ -39,9 +39,8 @@ class StripePayment {
             quantity: 1,
           },
         ],
-        success_url: `https://mockq.vercel.app/candidate/payment-success`,
-        // cancel_url: `http://localhost:5173${previousUrl}`,
-        cancel_url: `https://mockq.vercel.app/${previousUrl}`,
+        success_url: `${process.env.BASE_URL}/candidate/payment-success`,
+        cancel_url: `${process.env.BASE_URL}${previousUrl}`,
         metadata: {
           interviewerId,
           to,

@@ -6,13 +6,15 @@ import AdminRepository from '../repository/adminRepository'
  
 import JwtToken from '../utils/JwtToken'
 import adminAuthenticate from "../middlewares/adminAuth"
+import MailService from '../utils/mailService'
 const router = express.Router()
 
 
 
 const jwt = new JwtToken(process.env.JWT_SECRET as string)
 const adminRepository = new AdminRepository()
-const adminCase = new AdminUseCase(adminRepository, jwt)
+const mailService = new MailService()
+const adminCase = new AdminUseCase(adminRepository, jwt, mailService)
 
 
 const controller = new AdminController(adminCase)   
@@ -37,5 +39,8 @@ router.put('/approve-interviewer/:id',adminAuthenticate, (req, res, next) => con
 router.get('/interviews-list', adminAuthenticate, (req, res, next) => controller.getAllInterviews(req, res, next))
 
 router.get('/dashboard', adminAuthenticate, (req, res, next) => controller.getDashboardDetails(req, res, next))
+
+
+router.get('/')
 
 export default router
