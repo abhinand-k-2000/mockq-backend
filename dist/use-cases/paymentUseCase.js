@@ -19,7 +19,7 @@ class PaymentUseCase {
     }
     async handleSuccessfulPayment(session) {
         const { interviewerId, to, from, _id, date, candidateId, price, title, description, } = session.metadata;
-        const book = this.paymentRepository.bookSlot(session.metadata);
+        const book = await this.paymentRepository.bookSlot(session.metadata);
     }
     async makeSubscription(req) {
         try {

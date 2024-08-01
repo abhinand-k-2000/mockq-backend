@@ -213,11 +213,12 @@ class InterviewerController {
         try {
             const page = req.query.page ? parseInt(req.query.page) : 1;
             const limit = req.query.limit ? parseInt(req.query.limit) : 5;
+            const searchQuery = req.query.searchQuery ? req.query.searchQuery : '';
             const interviewerId = req.interviewerId;
             if (!interviewerId) {
                 throw new appError_1.default("Unauthorized user", 401);
             }
-            const { slots, total } = await this.interviewerCase.getInterviewSlots(interviewerId, page, limit);
+            const { slots, total } = await this.interviewerCase.getInterviewSlots(interviewerId, page, limit, searchQuery);
             return res
                 .status(200)
                 .json({
@@ -343,6 +344,35 @@ class InterviewerController {
             if (!isVerified)
                 throw new appError_1.default("You are not authorized to join this video conference.", 400);
             return res.status(200).json({ success: true, message: "Video conference verified successfully" });
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    async editProfile(req, res, next) {
+        try {
+            console.log(req.body);
+            const { details } = req.body;
+            const interviewerId = req.interviewerId;
+            if (!interviewerId)
+                throw new appError_1.default("Interviewer id not found", 400);
+            if (!details)
+                throw new appError_1.default("Details not provided", 400);
+            await this.interviewerCase.editProfile(interviewerId, details);
+            return res.status(200).json({ success: true, message: "Profile updated successfully" });
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    async editPassword(req, res, next) {
+        try {
+            const interviewerId = req.interviewerId;
+            const { currentPassword, newPassword } = req.body;
+            if (!interviewerId)
+                throw new appError_1.default("interviewer id not found", 400);
+            await this.interviewerCase.editPassword(interviewerId, currentPassword, newPassword);
+            return res.status(200).send({ success: true, message: "Password changed successfully" });
         }
         catch (error) {
             next(error);

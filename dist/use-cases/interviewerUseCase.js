@@ -119,8 +119,8 @@ class InterviewerUseCase {
         const slotAdded = await this.iInterviewerRepository.saveInterviewSlot(slotData);
         return slotAdded;
     }
-    async getInterviewSlots(interviewerId, page, limit) {
-        const { slots, total } = await this.iInterviewerRepository.getInterviewSlots(interviewerId, page, limit);
+    async getInterviewSlots(interviewerId, page, limit, searchQuery) {
+        const { slots, total } = await this.iInterviewerRepository.getInterviewSlots(interviewerId, page, limit, searchQuery);
         return { slots, total };
     }
     async getDomains() {
@@ -197,6 +197,19 @@ class InterviewerUseCase {
         else {
             return false;
         }
+    }
+    async editProfile(interviewerId, details) {
+        await this.iInterviewerRepository.editProfile(interviewerId, details);
+    }
+    async editPassword(interviewerId, oldPassword, newPassword) {
+        const interviewer = await this.iInterviewerRepository.findInterviewerById(interviewerId);
+        if (!interviewer)
+            throw new appError_1.default("Interviewer not found ", 400);
+        const isPasswordMatch = await this.hashPassword.compare(oldPassword, interviewer?.password);
+        if (!isPasswordMatch)
+            throw new appError_1.default("Current password is incorrect. Please check and try again.", 400);
+        const hashedPassword = await this.hashPassword.hash(newPassword);
+        await this.iInterviewerRepository.updatePassword(interviewerId, hashedPassword);
     }
 }
 exports.default = InterviewerUseCase;

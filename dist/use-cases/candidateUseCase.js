@@ -5,13 +5,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const appError_1 = __importDefault(require("../infrastructure/utils/appError"));
 class CandidateUseCase {
-    constructor(iCandidateRepository, otpGenerate, jwtToken, mailService, hashPassword, iNotificationRepository) {
+    constructor(iCandidateRepository, otpGenerate, jwtToken, mailService, hashPassword, iNotificationRepository, fileStorageService) {
         this.iCandidateRepository = iCandidateRepository;
         this.otpGenerate = otpGenerate;
         this.jwtToken = jwtToken;
         this.mailService = mailService;
         this.hashPassword = hashPassword;
         this.iNotificationRepository = iNotificationRepository;
+        this.fileStorageService = fileStorageService;
     }
     async findCandidate(candidateInfo) {
         const candidateFound = await this.iCandidateRepository.findByEmail(candidateInfo.email);
@@ -174,6 +175,27 @@ class CandidateUseCase {
     async getNotifications(userId) {
         const list = await this.iNotificationRepository.fetchAll(userId);
         return list;
+    }
+    async getProfileDetails(candidateId) {
+        const candidate = await this.iCandidateRepository.findCandidateById(candidateId);
+        return candidate;
+    }
+    async editProfile(candidateId, name, mobile, profilePic) {
+        let profilePicUrl = null;
+        if (profilePic.length > 0) {
+            profilePicUrl = await this.fileStorageService.uploadFile(profilePic, "profilePictures");
+        }
+        await this.iCandidateRepository.editProfile(candidateId, name, mobile, profilePicUrl);
+    }
+    async editPassword(candidateId, oldPassword, newPassword) {
+        const candidate = await this.iCandidateRepository.findCandidateById(candidateId);
+        if (!candidate)
+            throw new appError_1.default("Candidate not found ", 400);
+        const isPasswordMatch = await this.hashPassword.compare(oldPassword, candidate?.password);
+        if (!isPasswordMatch)
+            throw new appError_1.default("Current password is incorrect. Please check and try again.", 400);
+        const hashedPassword = await this.hashPassword.hash(newPassword);
+        await this.iCandidateRepository.updatePassword(candidateId, hashedPassword);
     }
 }
 exports.default = CandidateUseCase;

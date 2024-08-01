@@ -244,5 +244,19 @@ class CandidateRepository {
         const interview = await scheduledInterviewModel_1.ScheduledInterviewModel.findOne({ roomId: roomId });
         return interview;
     }
+    async editProfile(candidateId, name, mobile, profilePicUrl) {
+        if (!profilePicUrl) {
+            await candidateModel_1.CandidateModel.findByIdAndUpdate(candidateId, {
+                name: name,
+                mobile: mobile,
+            });
+            return;
+        }
+        await candidateModel_1.CandidateModel.findByIdAndUpdate(candidateId, {
+            name: name,
+            mobile: mobile,
+            profilePic: profilePicUrl
+        });
+    }
 }
 exports.default = CandidateRepository;

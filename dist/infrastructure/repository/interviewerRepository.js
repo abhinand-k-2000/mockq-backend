@@ -24,7 +24,7 @@ class InterviewerRepository {
         return newInterviewer;
     }
     async findInterviewerById(id) {
-        const interviewerData = await interviewerModel_1.InterviewerModel.findById(id, "-password");
+        const interviewerData = await interviewerModel_1.InterviewerModel.findById(id);
         if (!interviewerData) {
             throw new appError_1.default("Interviewer not found", 404);
         }
@@ -88,43 +88,46 @@ class InterviewerRepository {
         const savedSlot = await interviewSlot.save();
         return savedSlot;
     }
-    async getInterviewSlots(interviewerId, page, limit) {
-        const slotsList = await interviewSlotModel_1.InterviewSlotModel.aggregate([
+    async getInterviewSlots(interviewerId, page, limit, searchQuery) {
+        console.log(searchQuery);
+        const pipeline = [
             {
-                $match: { interviewerId: interviewerId.toString() },
+                $match: { interviewerId: interviewerId.toString() }
             },
             {
-                $unwind: "$slots",
+                $unwind: "$slots"
             },
-            {
-                $project: {
-                    _id: 0,
-                    date: "$slots.date",
-                    schedule: "$slots.schedule",
-                },
-            },
-            {
-                $sort: { date: -1 },
-            },
-            {
-                $skip: page - 1
-            },
-            {
-                $limit: limit
+        ];
+        console.log(await interviewSlotModel_1.InterviewSlotModel.aggregate(pipeline));
+        if (searchQuery) {
+            pipeline.push({
+                $match: {
+                    $or: [
+                        { "slots.schedule.title": { $regex: searchQuery, $options: "i" } },
+                        { "slots.schedule.technologies": { $elemMatch: { $regex: searchQuery, $options: "i" } } }
+                    ]
+                }
+            });
+        }
+        pipeline.push({
+            $project: {
+                _id: 0,
+                date: "$slots.date",
+                schedule: "$slots.schedule"
             }
-        ]);
-        const totalDocs = await interviewSlotModel_1.InterviewSlotModel.aggregate([
-            {
-                $match: { interviewerId: interviewerId.toString() },
-            },
-            {
-                $unwind: "$slots",
-            },
-            {
-                $count: "totalCount"
-            }
-        ]);
-        return { slots: slotsList, total: totalDocs[0].totalCount };
+        }, {
+            $sort: { date: -1 }
+        });
+        const totalPipeline = [...pipeline, { $count: "total" }];
+        const [totalResult] = await interviewSlotModel_1.InterviewSlotModel.aggregate(totalPipeline);
+        const total = totalResult ? totalResult.total : 0;
+        pipeline.push({
+            $skip: (page - 1) * limit
+        }, {
+            $limit: limit
+        });
+        const slots = await interviewSlotModel_1.InterviewSlotModel.aggregate(pipeline);
+        return { slots, total };
     }
     async getDomains() {
         const domainList = await stackModel_1.StackModel.find();
@@ -238,6 +241,17 @@ class InterviewerRepository {
     async getScheduledInterviewByRoomId(roomId) {
         const interview = await scheduledInterviewModel_1.ScheduledInterviewModel.findOne({ roomId: roomId });
         return interview;
+    }
+    async editProfile(interviewerId, details) {
+        const { name, mobile, currentDesignation, organisation, yearsOfExperience, introduction } = details;
+        await interviewerModel_1.InterviewerModel.findByIdAndUpdate(interviewerId, {
+            name,
+            mobile,
+            currentDesignation,
+            organisation,
+            yearsOfExperience,
+            introduction
+        });
     }
 }
 exports.default = InterviewerRepository;

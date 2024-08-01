@@ -29,7 +29,7 @@ class PaymentController {
                 price,
                 title,
                 description,
-                roomId
+                roomId,
             };
             const response = await this.paymentCase.makePayment(info);
             return res.status(200).json({ success: true, data: response });
@@ -40,15 +40,15 @@ class PaymentController {
     }
     async handleWebhook(req, res, next) {
         const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET.toString();
-        console.log('Received webhook request');
-        console.log('Headers:', req.headers);
-        console.log('Raw Body:', req.body.toString('utf8')); // Ensure this is a string for logging
-        console.log('endpoint: ', endpointSecret);
+        console.log("Received webhook request");
+        console.log("Headers:", req.headers);
+        console.log("Raw Body:", req.body.toString("utf8")); // Ensure this is a string for logging
+        console.log("endpoint: ", endpointSecret);
         const sig = req.headers["stripe-signature"];
         let event;
         try {
             event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
-            console.log('Webhook signature verified successfully');
+            console.log("Webhook signature verified successfully");
         }
         catch (error) {
             console.error(`Webhook signature verification failed: ${error.message}`);
@@ -69,7 +69,7 @@ class PaymentController {
                     await this.paymentCase.handleSubscriptionPayment(invoice, candidateId);
                 }
                 else {
-                    console.warn('Invoice metadata or candidateId is missing');
+                    console.warn("Invoice metadata or candidateId is missing");
                 }
                 break;
             default:

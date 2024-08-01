@@ -31,7 +31,7 @@ class PaymentUseCase {
       description,
     } = session.metadata;
 
-    const book = this.paymentRepository.bookSlot(session.metadata);
+    const book = await this.paymentRepository.bookSlot(session.metadata);
   }
 
   async makeSubscription(req: any) {

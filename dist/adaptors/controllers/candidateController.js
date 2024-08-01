@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const appError_1 = __importDefault(require("../../infrastructure/utils/appError"));
+const fs_1 = __importDefault(require("fs"));
 class CandidateController {
     constructor(candidateCase) {
         this.candidateCase = candidateCase;
@@ -278,6 +279,52 @@ class CandidateController {
                 throw new appError_1.default("candidate id not found", 400);
             const list = await this.candidateCase.getNotifications(candidateId);
             return res.status(200).json({ success: true, data: list });
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    async getProfileDetails(req, res, next) {
+        try {
+            const candidateId = req.candidateId;
+            if (!candidateId)
+                throw new appError_1.default("candidate id not found", 400);
+            const candidate = await this.candidateCase.getProfileDetails(candidateId);
+            return res.status(200).json({ success: true, data: candidate });
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    async editProfile(req, res, next) {
+        try {
+            const { name, mobile } = req.body;
+            const profilePic = req.file ? [req.file] : [];
+            const candidateId = req.candidateId;
+            if (!candidateId)
+                throw new appError_1.default("candidate id not found", 400);
+            await this.candidateCase.editProfile(candidateId, name, mobile, profilePic);
+            if (profilePic.length > 0) {
+                fs_1.default.unlink(profilePic[0].path, (err) => {
+                    if (err) {
+                        throw new appError_1.default("Error deleting file from server", 500);
+                    }
+                });
+            }
+            return res.status(200).send({ success: true, message: "Profile update successfully" });
+        }
+        catch (error) {
+            next(error);
+        }
+    }
+    async editPassword(req, res, next) {
+        try {
+            const candidateId = req.candidateId;
+            const { currentPassword, newPassword } = req.body;
+            if (!candidateId)
+                throw new appError_1.default("candidate id not found", 400);
+            await this.candidateCase.editPassword(candidateId, currentPassword, newPassword);
+            return res.status(200).send({ success: true, message: "Password changed successfully" });
         }
         catch (error) {
             next(error);
