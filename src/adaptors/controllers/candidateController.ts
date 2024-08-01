@@ -156,6 +156,8 @@ class CandidateController {
       const {interviewerId} = req.params 
       const {techName} = req.query
 
+      console.log('quey: ', interviewerId)
+
       if(!techName || typeof techName !== 'string') throw new AppError("Tech not found", 400)
 
 

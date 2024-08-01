@@ -135,6 +135,7 @@ class CandidateController {
         try {
             const { interviewerId } = req.params;
             const { techName } = req.query;
+            console.log('quey: ', interviewerId);
             if (!techName || typeof techName !== 'string')
                 throw new appError_1.default("Tech not found", 400);
             const details = await this.candidateCase.getInterviewerSlotDetails(interviewerId, techName);

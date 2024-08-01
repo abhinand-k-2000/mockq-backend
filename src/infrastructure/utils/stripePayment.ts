@@ -1,16 +1,13 @@
 import Stripe from "stripe";
 import AppError from "./appError";
 
-// if (process.env.STRIPE_API_SECRET) {
-//   var stripe = new Stripe(process.env.STRIPE_API_SECRET);
-// }
 
 const stripe = new Stripe(process.env.STRIPE_API_SECRET || "");
 
 class StripePayment {
-  // constructor(){}
 
-  makePayment = async (info: any) => {
+  makePayment = async (info: any, previousUrl: string) => {
+    console.log('inside sripe make payment: ', previousUrl)
     try {
       const {
         interviewerId,
@@ -43,7 +40,8 @@ class StripePayment {
           },
         ],
         success_url: `https://mockq.vercel.app/candidate/payment-success`,
-        cancel_url: `https://mockq.vercel.app/candidate/payment-failed`,
+        // cancel_url: `http://localhost:5173${previousUrl}`,
+        cancel_url: `https://mockq.vercel.app/${previousUrl}`,
         metadata: {
           interviewerId,
           to,

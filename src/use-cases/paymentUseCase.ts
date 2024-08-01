@@ -8,10 +8,11 @@ class PaymentUseCase {
     private paymentRepository: IPaymentRepository
   ) {}
 
-  async makePayment(info: any) {
+  async makePayment(info: any, previousUrl: string) {
+    console.log("prev url: ", previousUrl)
     console.log("Inside make payment: ", info);
 
-    const response = await this.stripePayment.makePayment(info);
+    const response = await this.stripePayment.makePayment(info, previousUrl);
     if (!response) {
       throw new AppError("Payment failed", 500);
     }

@@ -13,9 +13,10 @@ class PaymentController {
     }
     async makePayment(req, res, next) {
         try {
-            const data = req.body;
+            const { data, previousUrl } = req.body;
             const candidateId = req.candidateId?.toString();
-            const { interviewerId, slots } = data.data;
+            console.log(data);
+            const { interviewerId, slots } = data;
             const { schedule, date } = slots;
             const { title, price, description, to, from, _id } = schedule;
             const roomId = (0, uuid_1.v4)();
@@ -31,7 +32,7 @@ class PaymentController {
                 description,
                 roomId,
             };
-            const response = await this.paymentCase.makePayment(info);
+            const response = await this.paymentCase.makePayment(info, previousUrl);
             return res.status(200).json({ success: true, data: response });
         }
         catch (error) {

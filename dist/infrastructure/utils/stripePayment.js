@@ -5,14 +5,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const stripe_1 = __importDefault(require("stripe"));
 const appError_1 = __importDefault(require("./appError"));
-// if (process.env.STRIPE_API_SECRET) {
-//   var stripe = new Stripe(process.env.STRIPE_API_SECRET);
-// }
 const stripe = new stripe_1.default(process.env.STRIPE_API_SECRET || "");
 class StripePayment {
     constructor() {
-        // constructor(){}
-        this.makePayment = async (info) => {
+        this.makePayment = async (info, previousUrl) => {
+            console.log('inside sripe make payment: ', previousUrl);
             try {
                 const { interviewerId, to, from, _id, date, candidateId, price, title, description, roomId, } = info;
                 const session = await stripe.checkout.sessions.create({
@@ -33,7 +30,8 @@ class StripePayment {
                         },
                     ],
                     success_url: `https://mockq.vercel.app/candidate/payment-success`,
-                    cancel_url: `https://mockq.vercel.app/candidate/payment-failed`,
+                    // cancel_url: `http://localhost:5173${previousUrl}`,
+                    cancel_url: `https://mockq.vercel.app/${previousUrl}`,
                     metadata: {
                         interviewerId,
                         to,
