@@ -274,7 +274,7 @@ class InterviewerUseCase {
       userId: candidateId,
       heading: "Feedback Received",
       message: "You have received a new feedback.",
-      feedbackId: feeback._id,
+      feedbackId: feeback.interviewId,
       read: false
     }
     await this.iNotificationRepository.send(notification)

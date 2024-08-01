@@ -278,6 +278,7 @@ class CandidateController {
             if (!candidateId)
                 throw new appError_1.default("candidate id not found", 400);
             const list = await this.candidateCase.getNotifications(candidateId);
+            console.log("notifications: ", list);
             return res.status(200).json({ success: true, data: list });
         }
         catch (error) {
