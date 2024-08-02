@@ -20,7 +20,7 @@ class WalletRepository  implements IWalletRepository{
         const wallet = await WalletModel.findOne({interviewerId: interviewerId});
         if(!wallet) throw new AppError("Wallet not found ", 404)
         
-        wallet.balance = type === 'credit' ? wallet.balance + amount : wallet.balance - amount;
+        wallet.balance = type === 'credit' ? Number(wallet.balance) + amount :Number(wallet.balance) - amount;
         wallet.transactions?.push({ amount, type, date: new Date() })
         return await wallet.save();
 

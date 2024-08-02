@@ -16,7 +16,7 @@ class WalletRepository {
         const wallet = await walletModel_1.WalletModel.findOne({ interviewerId: interviewerId });
         if (!wallet)
             throw new appError_1.default("Wallet not found ", 404);
-        wallet.balance = type === 'credit' ? wallet.balance + amount : wallet.balance - amount;
+        wallet.balance = type === 'credit' ? Number(wallet.balance) + amount : Number(wallet.balance) - amount;
         wallet.transactions?.push({ amount, type, date: new Date() });
         return await wallet.save();
     }
