@@ -1,11 +1,13 @@
 import AppError from "../infrastructure/utils/appError";
 import IPaymentRepository from "../interface/repositories/IPaymentRepository";
+import IWalletRepository from "../interface/repositories/IWalletRepository";
 import IStripePayment from "../interface/utils/IStripePayment";
 
 class PaymentUseCase {
   constructor(
     private stripePayment: IStripePayment,
-    private paymentRepository: IPaymentRepository
+    private paymentRepository: IPaymentRepository,
+    private walletRepository: IWalletRepository
   ) {}
 
   async makePayment(info: any, previousUrl: string) {
@@ -19,21 +21,26 @@ class PaymentUseCase {
     return response;
   }
 
-  async handleSuccessfulPayment(session: any) {
-    const {
-      interviewerId,
-      to,
-      from,
-      _id,
-      date,
-      candidateId,
-      price,
-      title,
-      description,
-    } = session.metadata;
+    async handleSuccessfulPayment(session: any) {
+      const {
+        interviewerId,
+        to,
+        from,
+        _id,
+        date,
+        candidateId,
+        price,
+        title,
+        description,
+      } = session.metadata;
 
-    const book = await this.paymentRepository.bookSlot(session.metadata);
-  }
+      const book = await this.paymentRepository.bookSlot(session.metadata);
+      console.log("BOOK: ", book)
+      const type = 'credit';
+      const wallet = await this.walletRepository.updateWallet(interviewerId, price, type)
+      console.log("WALLET: ", wallet)
+
+    }
 
   async makeSubscription(req: any) {
     try {

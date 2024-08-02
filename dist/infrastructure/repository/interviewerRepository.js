@@ -235,7 +235,7 @@ class InterviewerRepository {
                 $group: { '_id': null, total: { $sum: "$price" } }
             }
         ]);
-        const totalRevenue = totalEarnings[0].total;
+        const totalRevenue = totalEarnings[0]?.total;
         return { interviews, totalRevenue };
     }
     async getScheduledInterviewByRoomId(roomId) {

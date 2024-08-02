@@ -15,6 +15,7 @@ import InterviewSlot from "../domain/entitites/interviewSlot";
 import ScheduledInterview from "../domain/entitites/scheduledInterview";
 import Feedback from "../domain/entitites/feedBack";
 import INotificationRepository from "../interface/repositories/INotificationRepository";
+import IWalletRepository from "../interface/repositories/IWalletRepository";
 
 type DecodedToken = {
   info: { userId: string };
@@ -32,6 +33,7 @@ class InterviewerUseCase {
     private hashPassword: IHashPassword,
     private fileStorageService: IFileStorageService,
     private iNotificationRepository: INotificationRepository,
+    private iWalletRepository: IWalletRepository
   ) {}
 
   async findInterviewer(interviewerInfo: InterviewerRegistration) {
@@ -85,6 +87,9 @@ class InterviewerUseCase {
     if (!interviewerSave) {
       throw new AppError("Failed to save interviewer", 500);
     }
+
+    // Create a wallet for the new interviewer
+    const newWallet = await this.iWalletRepository.createWallet(interviewerSave._id as string)
 
     const newToken = this.jwtToken.createJwtToken(
       interviewerSave._id as string,

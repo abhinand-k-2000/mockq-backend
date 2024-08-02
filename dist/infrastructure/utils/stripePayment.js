@@ -9,7 +9,7 @@ const stripe = new stripe_1.default(process.env.STRIPE_API_SECRET || "");
 class StripePayment {
     constructor() {
         this.makePayment = async (info, previousUrl) => {
-            console.log('inside sripe make payment: ', previousUrl);
+            // console.log('inside sripe make payment: ', previousUrl)
             try {
                 const { interviewerId, to, from, _id, date, candidateId, price, title, description, roomId, } = info;
                 const session = await stripe.checkout.sessions.create({

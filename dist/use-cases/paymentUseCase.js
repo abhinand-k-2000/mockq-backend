@@ -5,9 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const appError_1 = __importDefault(require("../infrastructure/utils/appError"));
 class PaymentUseCase {
-    constructor(stripePayment, paymentRepository) {
+    constructor(stripePayment, paymentRepository, walletRepository) {
         this.stripePayment = stripePayment;
         this.paymentRepository = paymentRepository;
+        this.walletRepository = walletRepository;
     }
     async makePayment(info, previousUrl) {
         console.log("prev url: ", previousUrl);
@@ -21,6 +22,10 @@ class PaymentUseCase {
     async handleSuccessfulPayment(session) {
         const { interviewerId, to, from, _id, date, candidateId, price, title, description, } = session.metadata;
         const book = await this.paymentRepository.bookSlot(session.metadata);
+        console.log("BOOK: ", book);
+        const type = 'credit';
+        const wallet = await this.walletRepository.updateWallet(interviewerId, price, type);
+        console.log("WALLET: ", wallet);
     }
     async makeSubscription(req) {
         try {

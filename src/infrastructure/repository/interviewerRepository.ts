@@ -339,7 +339,7 @@ console.log(searchQuery)
       }
     ])
 
-    const totalRevenue = totalEarnings[0].total
+    const totalRevenue = totalEarnings[0]?.total
     return {interviews, totalRevenue}
   }
 

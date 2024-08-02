@@ -10,9 +10,11 @@ const paymentUseCase_1 = __importDefault(require("../../use-cases/paymentUseCase
 const stripePayment_1 = __importDefault(require("../utils/stripePayment"));
 const paymentRepository_1 = __importDefault(require("../repository/paymentRepository"));
 const candidateAuth_1 = __importDefault(require("../middlewares/candidateAuth"));
+const walletRepository_1 = __importDefault(require("../repository/walletRepository"));
 const stripe = new stripePayment_1.default();
-const repository = new paymentRepository_1.default();
-const useCase = new paymentUseCase_1.default(stripe, repository);
+const paymentRepository = new paymentRepository_1.default();
+const walletRepository = new walletRepository_1.default();
+const useCase = new paymentUseCase_1.default(stripe, paymentRepository, walletRepository);
 const controller = new paymentController_1.default(useCase);
 router.post('/create-payment', candidateAuth_1.default, (req, res, next) => controller.makePayment(req, res, next));
 router.post('/webhook', express_1.default.raw({ type: ['application/json', 'application/json; charset=utf-8'] }), (req, res, next) => controller.handleWebhook(req, res, next));

@@ -6,11 +6,14 @@ import PaymentUseCase from '../../use-cases/paymentUseCase'
 import StripePayment from '../utils/stripePayment'
 import PaymentRepository from '../repository/paymentRepository'
 import candidateAuthenticate from "../middlewares/candidateAuth"
+import WalletRepository from '../repository/walletRepository'
 
 
 const stripe = new StripePayment()
-const repository = new PaymentRepository()
-const useCase = new PaymentUseCase(stripe, repository)
+const paymentRepository = new PaymentRepository()
+const walletRepository = new WalletRepository()
+
+const useCase = new PaymentUseCase(stripe, paymentRepository, walletRepository)  
 const controller = new PaymentController(useCase)
 
 router.post('/create-payment', candidateAuthenticate, (req, res, next) => controller.makePayment(req, res, next))

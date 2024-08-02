@@ -12,6 +12,7 @@ import { uploadStorage } from "../middlewares/multer";
 import authenticate from "../middlewares/interviewerAuth"
 import FileStorageService from "../utils/fileStorageService";
 import NotificationRepository from "../repository/notificationRepository"
+import WalletRepository from "../repository/walletRepository";
 
 
 const otp = new OtpGenerate()
@@ -23,7 +24,8 @@ const fileStorage = new FileStorageService()
 
 const interviewerRespository = new InterviewerRepository()
 const notificationRepository = new NotificationRepository()
-const interviewerCase = new InterviewerUseCase(interviewerRespository, otp, jwt, mail, hash, fileStorage, notificationRepository)
+const walletRepository = new WalletRepository()
+const interviewerCase = new InterviewerUseCase(interviewerRespository, otp, jwt, mail, hash, fileStorage, notificationRepository, walletRepository)
 const controller = new InterviewerController(interviewerCase)
 
 

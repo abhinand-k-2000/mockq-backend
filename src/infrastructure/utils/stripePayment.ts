@@ -7,7 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_API_SECRET || "");
 class StripePayment {
 
   makePayment = async (info: any, previousUrl: string) => {
-    console.log('inside sripe make payment: ', previousUrl)
+    // console.log('inside sripe make payment: ', previousUrl)
     try {
       const {
         interviewerId,

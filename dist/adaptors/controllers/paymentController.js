@@ -15,7 +15,6 @@ class PaymentController {
         try {
             const { data, previousUrl } = req.body;
             const candidateId = req.candidateId?.toString();
-            console.log(data);
             const { interviewerId, slots } = data;
             const { schedule, date } = slots;
             const { title, price, description, to, from, _id } = schedule;
@@ -41,10 +40,10 @@ class PaymentController {
     }
     async handleWebhook(req, res, next) {
         const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET.toString();
-        console.log("Received webhook request");
-        console.log("Headers:", req.headers);
-        console.log("Raw Body:", req.body.toString("utf8")); // Ensure this is a string for logging
-        console.log("endpoint: ", endpointSecret);
+        // console.log("Received webhook request");
+        // console.log("Headers:", req.headers);
+        // console.log("Raw Body:", req.body.toString("utf8")); // Ensure this is a string for logging
+        // console.log("endpoint: ", endpointSecret);
         const sig = req.headers["stripe-signature"];
         let event;
         try {

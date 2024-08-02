@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const appError_1 = __importDefault(require("../infrastructure/utils/appError"));
 class InterviewerUseCase {
-    constructor(iInterviewerRepository, otpGenerate, jwtToken, mailService, hashPassword, fileStorageService, iNotificationRepository) {
+    constructor(iInterviewerRepository, otpGenerate, jwtToken, mailService, hashPassword, fileStorageService, iNotificationRepository, iWalletRepository) {
         this.iInterviewerRepository = iInterviewerRepository;
         this.otpGenerate = otpGenerate;
         this.jwtToken = jwtToken;
@@ -13,6 +13,7 @@ class InterviewerUseCase {
         this.hashPassword = hashPassword;
         this.fileStorageService = fileStorageService;
         this.iNotificationRepository = iNotificationRepository;
+        this.iWalletRepository = iWalletRepository;
     }
     async findInterviewer(interviewerInfo) {
         const { email, name } = interviewerInfo;
@@ -52,6 +53,8 @@ class InterviewerUseCase {
         if (!interviewerSave) {
             throw new appError_1.default("Failed to save interviewer", 500);
         }
+        // Create a wallet for the new interviewer
+        const newWallet = await this.iWalletRepository.createWallet(interviewerSave._id);
         const newToken = this.jwtToken.createJwtToken(interviewerSave._id, "interviewer");
         return { success: true, data: { token: newToken } };
     }
