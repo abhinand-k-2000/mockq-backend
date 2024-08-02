@@ -12,6 +12,7 @@ import { InterviewSlotModel } from "../database/interviewSlotModel";
 import { InterviewerModel } from "../database/interviewerModel";
 import { ScheduledInterviewModel } from "../database/scheduledInterviewModel";
 import { StackModel } from "../database/stackModel";
+import { WalletModel } from "../database/walletModel";
 import AppError from "../utils/appError";
 
 
@@ -339,8 +340,10 @@ console.log(searchQuery)
       }
     ])
 
+    const wallet = await WalletModel.findOne({interviewerId})
+
     const totalRevenue = totalEarnings[0]?.total
-    return {interviews, totalRevenue}
+    return {interviews, totalRevenue, wallet}
   }
 
   async getScheduledInterviewByRoomId(roomId: string): Promise<ScheduledInterview | null> {

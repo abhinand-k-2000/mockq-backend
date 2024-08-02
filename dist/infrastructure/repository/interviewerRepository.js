@@ -8,6 +8,7 @@ const interviewSlotModel_1 = require("../database/interviewSlotModel");
 const interviewerModel_1 = require("../database/interviewerModel");
 const scheduledInterviewModel_1 = require("../database/scheduledInterviewModel");
 const stackModel_1 = require("../database/stackModel");
+const walletModel_1 = require("../database/walletModel");
 const appError_1 = __importDefault(require("../utils/appError"));
 class InterviewerRepository {
     async findByEmail(email) {
@@ -235,8 +236,9 @@ class InterviewerRepository {
                 $group: { '_id': null, total: { $sum: "$price" } }
             }
         ]);
+        const wallet = await walletModel_1.WalletModel.findOne({ interviewerId });
         const totalRevenue = totalEarnings[0]?.total;
-        return { interviews, totalRevenue };
+        return { interviews, totalRevenue, wallet };
     }
     async getScheduledInterviewByRoomId(roomId) {
         const interview = await scheduledInterviewModel_1.ScheduledInterviewModel.findOne({ roomId: roomId });
