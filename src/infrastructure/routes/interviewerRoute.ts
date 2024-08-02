@@ -74,6 +74,9 @@ router.put('/edit-profile', authenticate, (req, res, next) => controller.editPro
 
 router.put('/edit-password', authenticate, (req, res, next) => controller.editPassword(req, res, next))
 
+
+router.put('/update-wallet', authenticate, (req, res, next) => controller.updateWallet(req, res, next))
+
     
 
 

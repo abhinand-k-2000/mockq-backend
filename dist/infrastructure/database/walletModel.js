@@ -28,15 +28,17 @@ const mongoose_1 = __importStar(require("mongoose"));
 const walletSchema = new mongoose_1.Schema({
     interviewerId: { type: String, required: true },
     balance: { type: Number, required: true, default: 0 },
-    transactions: [{
+    transactions: [
+        {
             amount: { type: Number, required: true },
             type: {
                 type: String,
-                enum: ['credit', 'debit'],
-                required: true
+                enum: ["credit", "debit"],
+                required: true,
             },
-            date: { type: Date, required: true, default: Date.now }
-        }]
+            date: { type: Date, required: true, default: Date.now },
+        },
+    ],
 }, { timestamps: true });
-const WalletModel = mongoose_1.default.model('Wallet', walletSchema);
+const WalletModel = mongoose_1.default.model("Wallet", walletSchema);
 exports.WalletModel = WalletModel;

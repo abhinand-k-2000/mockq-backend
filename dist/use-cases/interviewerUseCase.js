@@ -214,5 +214,9 @@ class InterviewerUseCase {
         const hashedPassword = await this.hashPassword.hash(newPassword);
         await this.iInterviewerRepository.updatePassword(interviewerId, hashedPassword);
     }
+    async updateWallet(interviewerId, amount, type) {
+        const wallet = await this.iWalletRepository.updateWallet(interviewerId, amount, type);
+        return wallet;
+    }
 }
 exports.default = InterviewerUseCase;

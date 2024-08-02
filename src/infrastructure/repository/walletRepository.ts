@@ -19,8 +19,15 @@ class WalletRepository  implements IWalletRepository{
     async updateWallet(interviewerId: string, amount: number, type: "credit" | "debit"): Promise<Wallet> {
         const wallet = await WalletModel.findOne({interviewerId: interviewerId});
         if(!wallet) throw new AppError("Wallet not found ", 404)
+
+            console.log(`Current balance (before update): ${wallet.balance}, type: ${typeof wallet.balance}`);
+            console.log(`type of amount: ${typeof amount}`)
+
+            const currentBalance = Number(wallet.balance)
+            const newBalance = type === 'credit' ? currentBalance + amount : currentBalance - amount;
+            wallet.balance = newBalance;
         
-        wallet.balance = type === 'credit' ? Number(wallet.balance) + amount :Number(wallet.balance) - amount;
+        // wallet.balance = type === 'credit' ? Number(wallet.balance) + amount : Number(wallet.balance) - amount;
         wallet.transactions?.push({ amount, type, date: new Date() })
         return await wallet.save();
 

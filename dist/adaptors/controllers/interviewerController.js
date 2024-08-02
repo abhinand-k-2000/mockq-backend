@@ -378,5 +378,20 @@ class InterviewerController {
             next(error);
         }
     }
+    async updateWallet(req, res, next) {
+        try {
+            const interviewerId = req.interviewerId;
+            if (!interviewerId)
+                throw new appError_1.default("interviewer id not found", 400);
+            const { amount, type } = req.body;
+            if (!amount || !type)
+                throw new appError_1.default("amount and type are required", 400);
+            const wallet = await this.interviewerCase.updateWallet(interviewerId, amount, type);
+            return res.status(201).send({ success: true, data: wallet });
+        }
+        catch (error) {
+            next(error);
+        }
+    }
 }
 exports.default = InterviewerController;

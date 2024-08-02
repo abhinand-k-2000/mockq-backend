@@ -52,4 +52,5 @@ router.get('/get-payment-dashboard', interviewerAuth_1.default, (req, res, next)
 router.post('/verify-video-conference', interviewerAuth_1.default, (req, res, next) => controller.verifyVideoConference(req, res, next));
 router.put('/edit-profile', interviewerAuth_1.default, (req, res, next) => controller.editProfile(req, res, next));
 router.put('/edit-password', interviewerAuth_1.default, (req, res, next) => controller.editPassword(req, res, next));
+router.put('/update-wallet', interviewerAuth_1.default, (req, res, next) => controller.updateWallet(req, res, next));
 exports.default = router;

@@ -320,6 +320,12 @@ class InterviewerUseCase {
     await this.iInterviewerRepository.updatePassword(interviewerId, hashedPassword)
   }
 
+  async updateWallet(interviewerId: string, amount: number, type: "credit" | "debit") {
+    
+    const wallet = await this.iWalletRepository.updateWallet(interviewerId, amount, type);
+    return wallet
+  }
+
 
 
 
