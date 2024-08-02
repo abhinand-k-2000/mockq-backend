@@ -23,6 +23,8 @@ class WalletRepository  implements IWalletRepository{
             console.log(`Current balance (before update): ${wallet.balance}, type: ${typeof wallet.balance}`);
             console.log(`type of amount: ${typeof amount}`)
 
+            amount = Number(amount)
+
             const currentBalance = Number(wallet.balance)
             const newBalance = type === 'credit' ? currentBalance + amount : currentBalance - amount;
             wallet.balance = newBalance;
